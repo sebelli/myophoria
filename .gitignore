@@ -1,0 +1,30 @@
+# build output
+target/
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+
+# front end
+web/node_modules/
+web/dist/
+src/main/resources/public/
+
+# runtime data and backups (never commit personal data)
+data/
+backups/
+exports/
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+
+# nix / direnv
+.direnv/
+result
+
+# editors and misc
+.idea/
+.vscode/
+*.iml
+*.log
+.env
