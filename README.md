@@ -1,30 +1,34 @@
 # Myophoria
 
-A gym lift tracker: a pure Java core, a Javalin REST API, and a mobile-first
-Svelte web UI, backed by SQLite. It runs on a laptop; a phone uses it over
-Tailscale.
+A gym lift tracker for one person. It runs on a laptop and a phone uses it
+over Tailscale.
 
-What it does: log a workout set by set with prefilled weights from last time,
-manage exercises (5 equipment types) and gyms, browse and edit history,
-see a session summary and a per-exercise progression chart, track bodyweight,
-build templates, and export/import everything as CSV with automatic backups
-and recovery from a corrupted database.
+- **Backend:** pure Java 25 core, Javalin REST API (`/api/v1`), SQLite
+- **Frontend:** mobile-first Svelte 5 + TypeScript + Tailwind, served by the backend
+- **Architecture:** ports and adapters; the core has no framework or database code
 
-## Requirements
+## Features
 
-- JDK 25 and Node 22+ (Maven comes with the wrapper, `./mvnw`).
-- On NixOS or with Nix: `nix develop` (or direnv) provides all of it, plus
-  SQLite, jq and httpie.
+- Log a workout set by set, prefilled with last time's weights at the same gym
+- Warm-up, working and failure sets; kg or lb per set
+- 5 equipment types (barbell, dumbbell, stack, plate-loaded, calisthenics), each with its own weight rules
+- Multiple gyms, workout templates, bodyweight tracking
+- History with filters, backfill of past workouts, editing
+- Session summary (volume, top and average weight) and a per-exercise progression chart
+- CSV export/import (ZIP), automatic backups before risky operations, recovery from a corrupted database
 
-## Build and run
+## Quick start
 
-One runnable jar serves the UI and the API on http://127.0.0.1:7070:
+Requirements: JDK 25 and Node 24+. Maven comes with the wrapper (`./mvnw`).
+With Nix, `nix develop` (or direnv) provides everything, plus SQLite, jq and httpie.
 
-    cd web && npm install && npm run build && cd ..   # writes src/main/resources/public/
-    ./mvnw -q package                                  # tests + jar
-    java -jar target/myophoria-*.jar
+```sh
+cd web && npm install && npm run build && cd ..   # UI → src/main/resources/public/
+./mvnw -q package                                  # runs tests, builds the jar
+java -jar target/myophoria-*.jar                   # http://127.0.0.1:7070
+```
 
-Settings (environment variables):
+### Settings (environment variables)
 
 | Variable | Default | Meaning |
 |---|---|---|
@@ -34,11 +38,29 @@ Settings (environment variables):
 
 ## Development
 
-    ./mvnw verify                          # backend build and all tests
-    ./mvnw test -Dtest=ClassName#method    # one test
-    ./mvnw -q exec:java                    # run the backend from source
-    cd web && npm run dev                  # UI with hot reload; proxies /api to :7070
-    cd web && npm run check                # Svelte + TypeScript checks
+```sh
+./mvnw verify                          # backend build and all tests
+./mvnw test -Dtest=ClassName#method    # one test
+./mvnw -q exec:java                    # run the backend from source
+cd web && npm run dev                  # UI with hot reload; proxies /api to :7070
+cd web && npm run check                # Svelte + TypeScript checks
+```
+
+## Project layout
+
+```
+src/main/java/myophoria/
+  core/          domain: model, service (use cases), port (interfaces), csv, error
+  persistence/   SQLite implementations of the ports, backups, recovery, migrations
+  api/           Javalin controllers, error mapping, Main (wiring)
+src/main/resources/db/migration/   SQL schema
+src/test/java/myophoria/           tests per layer (core runs on in-memory fakes)
+web/src/                           Svelte UI: screens, components, lib (api client, state)
+docs/                              documentation (see below)
+```
+
+[docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) explains every class and how a
+request travels through the layers.
 
 ## Demo data
 
@@ -47,7 +69,9 @@ Settings (environment variables):
 one bad row and one orphan set, to show the import report. Zip a folder and
 import it on the Data screen (More → Data → Import):
 
-    jar --create --no-manifest --file demo.zip -C docs/demo/data .
+```sh
+jar --create --no-manifest --file demo.zip -C docs/demo/data .
+```
 
 Importing never overwrites: import the broken bundle first, then the good one,
 and only the two missing sets are added. [docs/DEMO.md](docs/DEMO.md) is the
@@ -56,21 +80,26 @@ full demo script.
 ## Phone access over Tailscale
 
 The server only listens on 127.0.0.1. `tailscale serve` puts it on your
-tailnet with HTTPS. Never use `tailscale funnel`: it makes the app public, and
-there is no login.
+tailnet with HTTPS. **Never use `tailscale funnel`**: it makes the app public,
+and there is no login.
 
-    tailscale serve --bg 7070                 # https://<machine>.<tailnet>.ts.net
-    tailscale serve status                    # shows the URL
-    MYOPHORIA_ALLOWED_HOSTS=<machine>.<tailnet>.ts.net java -jar target/myophoria-*.jar
-    tailscale serve reset                     # stop serving
+```sh
+tailscale serve --bg 7070                 # https://<machine>.<tailnet>.ts.net
+tailscale serve status                    # shows the URL
+MYOPHORIA_ALLOWED_HOSTS=<machine>.<tailnet>.ts.net java -jar target/myophoria-*.jar
+tailscale serve reset                     # stop serving
+```
 
 Open the URL on a phone signed in to the same tailnet.
 
 ## Documentation
 
-- [docs/DESIGN.md](docs/DESIGN.md): architecture and design rules
-- [docs/uml/classes.md](docs/uml/classes.md): class diagrams, generated from the code
-- [docs/API.md](docs/API.md): REST endpoints
-- [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md): CSV export/import format
-- [docs/DECISIONS.md](docs/DECISIONS.md): decision log
-- [docs/DEMO.md](docs/DEMO.md) and [docs/DEFENSE.md](docs/DEFENSE.md): demo script and study guide
+| File | Contents |
+|---|---|
+| [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) | every class and interface, their relations, program paths |
+| [docs/DESIGN.md](docs/DESIGN.md) | architecture and design rules |
+| [docs/uml/classes.md](docs/uml/classes.md) | Mermaid class diagrams |
+| [docs/API.md](docs/API.md) | REST endpoints |
+| [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md) | CSV export/import format |
+| [docs/DECISIONS.md](docs/DECISIONS.md) | decision log |
+| [docs/DEMO.md](docs/DEMO.md), [docs/DEFENSE.md](docs/DEFENSE.md) | demo script, study guide |
