@@ -118,7 +118,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T7.1 | UML from code (`docs/uml/classes.md`) | Sonnet | T6.2 | DONE |
 | T7.2 | DESIGN, API, DATA_FORMAT, DECISIONS | Sonnet | T7.1 | DONE |
 | T7.3 | README + Javadoc completeness | Sonnet | T7.2 | DONE |
-| T7.4 | Demo script + defense study guide | Sonnet | T7.3 | TODO |
+| T7.4 | Demo script + defense study guide | Sonnet | T7.3 | DONE |
 | T7.5 | Q&A drill with the developer | Haiku | T7.4 | TODO |
 | T7.6 | Final review, merge, tag | Opus | T7.5 | TODO |
 
@@ -706,3 +706,4 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
 - 2026-11-25 T7.1 Opus: docs/uml/classes.md generated from javap -p of target/classes (7 diagrams, all render with mermaid-cli 11.4.2). DONE.
 - 2026-11-25 T7.2 Opus: DESIGN, API (checked against every controller route and DTO), DATA_FORMAT (checked against CsvService/CsvCodec), DECISIONS (+5 entries from reviews). DONE.
 - 2026-11-25 T7.3 Opus: README (requirements, build/run, env table, dev commands, demo data, Tailscale, doc index); doclint -Xdoclint:missing finds no undocumented type or member (enum constants were the only gap); docs/demo/{data,broken} CSV bundles verified by importing into a temp server (broken: 1 skipped + 1 orphan; good bundle afterwards adds exactly the 2 missing sets). DONE.
+- 2026-11-25 T7.4 Opus: docs/DEMO.md (10-minute walkthrough over every rubric row; import of the broken bundle and DB corruption recovery rehearsed against the jar on a temp data dir) and docs/DEFENSE.md (per-class what/why/rubric/Q&A, tick-a-set request walkthrough with file:line refs, rubric evidence map, tests). DONE.
