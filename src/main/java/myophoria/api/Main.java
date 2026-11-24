@@ -48,7 +48,7 @@ public class Main {
         }
         Database db = new Database(dataDir);
         List<String> warnings = db.open();
-        createApp(db, dataDir.resolve("backups"), warnings, allowed).start("127.0.0.1", port);
+        createApp(db, db.backupDir(), warnings, allowed).start("127.0.0.1", port);
     }
 
     /** Wires repositories, services and controllers and returns the (not yet started) server. */
