@@ -74,12 +74,12 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T1.3 | Web project init (Svelte, Vite, TS, Tailwind) | Sonnet | T1.1 | DONE |
 | T1.4 | One-jar integration check | Sonnet | T1.2, T1.3 | DONE |
 | **Phase 2** | **Exercise slice end to end**, branch `feat/exercise-slice`, tag `v0.1.0` | | | |
-| T2.1 | Core foundations + Exercise hierarchy | Sonnet | T1.4 | TODO |
-| T2.2 | Database, Migrator, `V1__init.sql`, SqliteExerciseRepository | Sonnet | T2.1 | TODO |
-| T2.3 | ExerciseService (no permanent delete yet) | Sonnet | T2.2 | TODO |
-| T2.4 | API foundation + ExerciseController | Sonnet | T2.3 | TODO |
-| T2.5 | Web: API client + basic Exercises screen | Sonnet | T2.4 | TODO |
-| T2.6 | Phase review, merge, tag | Opus | T2.5 | TODO |
+| T2.1 | Core foundations + Exercise hierarchy | Sonnet | T1.4 | DONE |
+| T2.2 | Database, Migrator, `V1__init.sql`, SqliteExerciseRepository | Sonnet | T2.1 | DONE |
+| T2.3 | ExerciseService (no permanent delete yet) | Sonnet | T2.2 | DONE |
+| T2.4 | API foundation + ExerciseController | Sonnet | T2.3 | DONE |
+| T2.5 | Web: API client + basic Exercises screen | Sonnet | T2.4 | DONE |
+| T2.6 | Phase review, merge, tag | Opus | T2.5 | DONE |
 | **Phase 3** | **Core features**, branch `feat/core` | | | |
 | T3.1 | Gyms vertical | Sonnet | T2.6 | TODO |
 | T3.2 | Bodyweight vertical | Sonnet | T2.6 | TODO |
@@ -377,7 +377,7 @@ Vite dev server proxies `/api` to `http://127.0.0.1:7070`. `build.outDir = ../sr
 
 ## 5. Schema (approved in T0.2, 2026-11-25)
 
-`src/main/resources/db/migration/V1__init.sql`. All tables are `STRICT` (SQLite rejects wrong value types). Timestamps are fixed-width ISO-8601 UTC text `2026-11-25T07:30:00.000Z`, always written with `CsvCodec.TIMESTAMP` (never `Instant.toString()`, whose length varies and breaks text sorting). Dates `YYYY-MM-DD`, booleans `0/1`, enums by name.
+`src/main/resources/db/migration/V1__init.sql`. All tables are `STRICT` (SQLite rejects wrong value types). Timestamps are fixed-width ISO-8601 UTC text `2026-11-25T07:30:00.000Z`, always written with `CsvCodec.TIMESTAMP` (never `Instant.toString()`, whose length varies and breaks text sorting). Dates `YYYY-MM-DD`, booleans `0/1`, enums by name. Stored timestamps have millisecond precision, so services truncate `clock.instant()` with `.truncatedTo(ChronoUnit.MILLIS)` before putting it on an entity (otherwise a reloaded entity no longer equals the one in memory).
 
 ```sql
 CREATE TABLE gyms (
@@ -666,7 +666,12 @@ Each vertical = model (if not yet present) + port + service + SQLite adapter + c
 
 Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions stay until the planner compacts at phase end.
 
-_(none yet)_
+- Q1 [T2.6] (Opus review) Phase 2 fix list → all applied by Opus in the review commit:
+  1. `./mvnw verify` failed on a fresh clone (no web build): Javalin rejects a missing classpath `/public`. `Main` now adds static files only if the resource exists, else logs a warning.
+  2. Host/Origin guard accepted `evil.com@localhost` (URI treats the part before `@` as user info). Headers containing `@` are rejected; test added.
+  3. `ExerciseService.update` ran the duplicate check even when the name was unchanged, so an imported deleted twin could block editing laterality. The check now runs only when the name key changes; test added.
+  4. Exercises screen: fast typing could show stale results (out-of-order responses). A sequence counter drops old responses.
+  Reviewed and fine: core purity, entity rules (§0.4), records only in api/service, Javadoc on core, §4 names and packages, Clock + UUID in services, millisecond truncation, error format §6.1.
 
 ---
 
@@ -682,3 +687,10 @@ Format: `YYYY-MM-DD T<id> <model> <status>: what changed; notes (versions picked
 - 2026-11-25 T1.2 Sonnet: pom + wrapper + hello Main (GET /api/v1/status). Versions (Maven Central, latest stable): javalin 7.3.0, jackson-databind/jsr310 2.23.0, sqlite-jdbc 3.54.1.0, slf4j-simple 2.0.20 (2.1.0 is alpha), junit-bom 6.1.3 (6.2.0 is milestone), surefire 3.6.1, exec 3.7.0, shade 3.6.2. Compiler/jar plugins left at Maven defaults (latest are betas). Note: Javalin 7 registers routes in config.routes; httpie needs --ignore-stdin in scripts. DONE.
 - 2026-11-25 T1.3 Sonnet: web/ (vite svelte-ts, tailwind 4.3.5 via @tailwindcss/vite, vite 8.3.6, svelte 5.57.3); proxy + outDir per §4.8; engines.node >=24; demo files removed; App.svelte prints /api/v1/status. check + build pass. DONE.
 - 2026-11-25 T1.4 Sonnet: Main serves classpath /public; jar serves SPA at / and /api/v1/status; README Development updated. Phase 1 DONE (merge to main pending developer: remote not pushed).
+- 2026-11-25 T2.1 Sonnet: enums, VolumeCalculable, 4 exceptions, CsvSerializable, Exercise + 5 subclasses (CSV methods throw UnsupportedOperationException until T4.2); 9 tests pass; core purity ok. Phase 1 merged to main (bc61ab2). DONE.
+- 2026-11-25 T2.2 Sonnet: V1__init.sql (copied from §5), Migrator (script list hardcoded: jars cannot list resources; statements split on ";"), Database, SqliteExerciseRepository, ExerciseRepository port. Added a minimal CsvCodec holding only TIMESTAMP (needed now for deleted_at; T4.1 adds the rest). Bug fixed on the way: an unclosed PRAGMA statement blocked the migration commit. 13 tests pass; sqlite3 schema has 7 tables, 7 indexes, seeded gym. DONE.
+- 2026-11-25 T2.2 follow-up Opus: Migrator runs each script in one executeUpdate (sqlite-jdbc executes all statements), so the ";" split shortcut is gone; test now fails if a V*.sql file is missing from Migrator.SCRIPTS; §5 note: services truncate timestamps to millis.
+- 2026-11-25 T2.3 Sonnet: ExerciseService(repo, Clock) with search/get/create/update/softDelete/restore (usage + deletePermanently + Backups port deferred to T4.6, constructor gains Backups then); FakeExerciseRepository in test/fake; 11 service tests, 24 total pass. Note: a deleted name also blocks create/rename (409 softDeleted=true) so restore can only clash with data that bypassed the service. DONE.
+- 2026-11-25 T2.4 Sonnet: Main (env config G13, createApp wiring, Host/Origin guard), ErrorHandlers (§6.1), ExerciseController, DataController (/status). Javalin 7: routes via config.routes, JavalinJackson(new ObjectMapper(), false). Bug found by ApiTest: Jackson JsonProcessingException escaped as 500, now mapped to 400 INVALID_INPUT. 31 tests pass; httpie smoke ok (201/409/404/403). DONE.
+- 2026-11-25 T2.5 Sonnet: web lib/types.ts, lib/api.ts (ApiError), hash-routed App.svelte, screens/Exercises.svelte (search, type chips, add, soft delete). npm check + build pass; verified create/search through the Vite proxy against the real jar with curl. Not verified: rendering in a browser (no browser run). DONE.
+- 2026-11-25 T2.6 Opus: Phase 2 review; 4 fixes applied (§8 Q1); 32 tests pass with and without a web build. Merged to main, tagged v0.1.0. DONE.
