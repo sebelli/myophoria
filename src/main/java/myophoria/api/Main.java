@@ -1,6 +1,9 @@
 package myophoria.api;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.javalin.Javalin;
 import io.javalin.http.ForbiddenResponse;
 import io.javalin.http.staticfiles.Location;
@@ -11,8 +14,10 @@ import java.time.Clock;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import myophoria.core.service.BodyweightService;
 import myophoria.core.service.ExerciseService;
 import myophoria.persistence.Database;
+import myophoria.persistence.SqliteBodyweightRepository;
 import myophoria.persistence.SqliteExerciseRepository;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +45,10 @@ public class Main {
         ExerciseService exercises = new ExerciseService(new SqliteExerciseRepository(db), Clock.systemUTC());
         ExerciseController exerciseController = new ExerciseController(exercises);
         DataController dataController = new DataController(warnings);
+        BodyweightController bodyweightController =
+                new BodyweightController(new BodyweightService(new SqliteBodyweightRepository(db)));
         return Javalin.create(config -> {
-            config.jsonMapper(new JavalinJackson(new ObjectMapper(), false));
+            config.jsonMapper(new JavalinJackson(jsonMapper(), false));
             if (Main.class.getResource("/public") != null) { // absent on a fresh clone before the web build
                 config.staticFiles.add("/public", Location.CLASSPATH);
             } else {
@@ -56,7 +63,16 @@ public class Main {
             });
             dataController.register(config.routes);
             exerciseController.register(config.routes);
+            bodyweightController.register(config.routes);
         });
+    }
+
+    /** Jackson setup: ISO dates and times; an explicit null number is an error (a missing one is 0, which entity checks reject where 0 is invalid). */
+    static ObjectMapper jsonMapper() {
+        return new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES);
     }
 
     /** Checks a Host header (host[:port]) or an Origin header (scheme://host[:port]); an absent Origin is fine. */

@@ -82,7 +82,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T2.6 | Phase review, merge, tag | Opus | T2.5 | DONE |
 | **Phase 3** | **Core features**, branch `feat/core` | | | |
 | T3.1 | Gyms vertical | Sonnet | T2.6 | TODO |
-| T3.2 | Bodyweight vertical | Sonnet | T2.6 | TODO |
+| T3.2 | Bodyweight vertical | Sonnet | T2.6 | DONE |
 | T3.3 | Session + set model and repositories | Sonnet | T3.1 | TODO |
 | T3.4 | WorkoutService (live flow, prefill) + endpoints | Sonnet | T3.2, T3.3 | TODO |
 | T3.5 | HistoryService + endpoints | Sonnet | T3.4 | TODO |
@@ -694,3 +694,4 @@ Format: `YYYY-MM-DD T<id> <model> <status>: what changed; notes (versions picked
 - 2026-11-25 T2.4 Sonnet: Main (env config G13, createApp wiring, Host/Origin guard), ErrorHandlers (§6.1), ExerciseController, DataController (/status). Javalin 7: routes via config.routes, JavalinJackson(new ObjectMapper(), false). Bug found by ApiTest: Jackson JsonProcessingException escaped as 500, now mapped to 400 INVALID_INPUT. 31 tests pass; httpie smoke ok (201/409/404/403). DONE.
 - 2026-11-25 T2.5 Sonnet: web lib/types.ts, lib/api.ts (ApiError), hash-routed App.svelte, screens/Exercises.svelte (search, type chips, add, soft delete). npm check + build pass; verified create/search through the Vite proxy against the real jar with curl. Not verified: rendering in a browser (no browser run). DONE.
 - 2026-11-25 T2.6 Opus: Phase 2 review; 4 fixes applied (§8 Q1); 32 tests pass with and without a web build. Merged to main, tagged v0.1.0. DONE.
+- 2026-11-25 T3.2 Opus: BodyweightEntry, port, service, SQLite adapter, controller (GET list/latest, POST, PUT, DELETE). Order change: T3.2 → T3.3 → T3.1 (activeGym needs sessions; sessions only need the seeded gym). Shared pieces: Database.format/instant (timestamp text, package-private), Jackson JavaTimeModule + ISO strings + FAIL_ON_NULL_FOR_PRIMITIVES, test ApiTestSupport base. 38 tests pass. DONE.

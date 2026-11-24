@@ -4,10 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import myophoria.core.csv.CsvCodec;
 import myophoria.core.model.EquipmentType;
 import myophoria.core.model.Exercise;
 import myophoria.core.model.Laterality;
@@ -60,7 +58,7 @@ public class SqliteExerciseRepository implements ExerciseRepository {
             ps.setString(3, e.getNameKey());
             ps.setString(4, e.type().name());
             ps.setString(5, e.getLaterality().name());
-            ps.setString(6, format(e.getDeletedAt()));
+            ps.setString(6, Database.format(e.getDeletedAt()));
             ps.executeUpdate();
         } catch (SQLException ex) {
             throw new IllegalStateException("Cannot insert exercise " + e.getId(), ex);
@@ -75,7 +73,7 @@ public class SqliteExerciseRepository implements ExerciseRepository {
             ps.setString(2, e.getNameKey());
             ps.setString(3, e.type().name());
             ps.setString(4, e.getLaterality().name());
-            ps.setString(5, format(e.getDeletedAt()));
+            ps.setString(5, Database.format(e.getDeletedAt()));
             ps.setString(6, e.getId());
             ps.executeUpdate();
         } catch (SQLException ex) {
@@ -109,17 +107,12 @@ public class SqliteExerciseRepository implements ExerciseRepository {
         }
     }
 
-    private static String format(Instant at) {
-        return at == null ? null : CsvCodec.TIMESTAMP.format(at);
-    }
-
     private static Exercise map(ResultSet rs) throws SQLException {
-        String deleted = rs.getString("deleted_at");
         return Exercise.of(
                 EquipmentType.valueOf(rs.getString("equipment_type")),
                 rs.getString("id"),
                 rs.getString("name"),
                 Laterality.valueOf(rs.getString("laterality")),
-                deleted == null ? null : Instant.from(CsvCodec.TIMESTAMP.parse(deleted)));
+                Database.instant(rs.getString("deleted_at")));
     }
 }
