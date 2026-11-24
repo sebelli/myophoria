@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-Myophoria is a gym lift tracker: a pure Java core, a Javalin REST API, and a mobile-first Svelte web UI, backed by SQLite. All phases of `PLAN.md` are built and documented; only developer tasks remain (T6.3 phone test over Tailscale, T7.5 Q&A drill, then T7.6 final review and the `v1.0.0` tag). See the board in `PLAN.md` §1. Dependency versions are logged in `PLAN.md` §9 — don't invent versions.
+Myophoria is a gym lift tracker: a pure Java core, a Javalin REST API, and a mobile-first Svelte web UI, backed by SQLite. All tasks in `PLAN.md` are done and `v1.0.0` is tagged; what remains is the developer studying `docs/DEFENSE.md` before the defense. See the board in `PLAN.md` §1. Dependency versions are logged in `PLAN.md` §9 — don't invent versions.
 
 ## Environment and commands
 

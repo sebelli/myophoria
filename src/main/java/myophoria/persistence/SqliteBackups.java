@@ -50,7 +50,6 @@ public class SqliteBackups implements Backups {
             throw new IOException("Backup failed: " + e.getMessage(), e); // checked: the caller decides (abort delete/import)
         } finally {
             // not a resource-only cleanup: also removes the half-written file after any failure
-            Files.deleteIfExists(tmp);
             if (c != null) {
                 try {
                     c.close();
@@ -58,6 +57,7 @@ public class SqliteBackups implements Backups {
                     // closing a read-only connection cannot lose data
                 }
             }
+            Files.deleteIfExists(tmp); // last, so a failure here cannot leak the connection
         }
     }
 }

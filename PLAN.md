@@ -120,7 +120,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T7.3 | README + Javadoc completeness | Sonnet | T7.2 | DONE |
 | T7.4 | Demo script + defense study guide | Sonnet | T7.3 | DONE |
 | T7.5 | Q&A drill with the developer | Haiku | T7.4 | DONE |
-| T7.6 | Final review, merge, tag | Opus | T7.5 | TODO |
+| T7.6 | Final review, merge, tag | Opus | T7.5 | DONE |
 
 ### Build flow
 
@@ -709,3 +709,4 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
 - 2026-11-25 T7.4 Opus: docs/DEMO.md (10-minute walkthrough over every rubric row; import of the broken bundle and DB corruption recovery rehearsed against the jar on a temp data dir) and docs/DEFENSE.md (per-class what/why/rubric/Q&A, tick-a-set request walkthrough with file:line refs, rubric evidence map, tests). DONE.
 - 2026-11-25 T6.3 Opus + dev: phone test over `tailscale serve` passed (add gym/exercise, start and log a workout). Pitfall found: POSTs return 403 "Host or origin not allowed" unless MYOPHORIA_ALLOWED_HOSTS is the exact host from `tailscale serve status` (no scheme); GETs pass because they carry no Origin. DONE.
 - 2026-11-25 T7.5 Haiku Q&A drill (§8 weak spots, class by class): Exercise abstract, answered well (no generic exercise; subclasses carry type behaviour). WorkoutSession finish rule: knew why (one workout per session), not where (finish(now) in the core); browser-only checks are bypassable through the API. ErrorHandlers: did not know NotFoundException maps to 404 (translated in the api layer). Drill stopped after 3 questions at the developer's request. DONE (partial).
+- 2026-11-25 T7.6 Opus: final review of everything after the T6.1 review (T6.2 fixes, enum Javadoc); verify, core purity and web check/build all green. One fix: SqliteBackups closes the connection before deleting the temp file, so a failed delete cannot leak it. All phases merged to main; tagged v1.0.0. DONE.
