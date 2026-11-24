@@ -90,7 +90,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T3.7 | Templates vertical | Sonnet | T3.4 | DONE |
 | T3.8 | Phase review, merge | Opus | T3.5–T3.7 | DONE |
 | **Phase 4** | **Files: CSV, backup, recovery**, branch `feat/files` | | | |
-| T4.1 | CsvCodec | Sonnet | T3.8 | TODO |
+| T4.1 | CsvCodec | Sonnet | T3.8 | DONE |
 | T4.2 | CsvSerializable on all entities | Sonnet | T4.1 | TODO |
 | T4.3 | SqliteBackups + backup endpoint | Sonnet | T3.8 | TODO |
 | T4.4 | CsvService ZIP export/import + endpoints | Sonnet | T4.2, T4.3 | TODO |
@@ -678,3 +678,4 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
   Accepted as is (personal scale, explain in Q&A): services load whole tables (`findAll`) and filter in Java per handoff §5.4; two simultaneous "start" requests can race and the loser gets a 500 from the one-open index (UI sends one); `GymService.delete`'s "last gym" check is unreachable while the default is protected, kept as a guard.
   Contract additions made during Phase 3 (all listed in §9): `SessionHeader` record, `ExerciseService.allById()`, `Gym.SEEDED_DEFAULT_ID`, `GymService.CHRONOLOGICAL`, `HistoryService.NEWEST_FIRST`, `BodyweightService.NEWEST_FIRST`, package-private `Database.format/instant`.
 - 2026-11-25 T3.8 Opus: Phase 3 review (§8 Q2): running workout's gym locked in history edit; template list loads exercises once. 82 tests pass. Merged to main. DONE.
+- 2026-11-25 T4.1 Opus: CsvCodec.formatRow (quotes only when needed, null → empty) and parse (state machine: quotes, doubled quotes, embedded comma/CR/LF, BOM, CRLF/LF/CR, blank lines skipped, column count vs header, line numbers of the record start; text after a closing quote and unterminated quotes are errors). 7 tests; 89 total pass. DONE.
