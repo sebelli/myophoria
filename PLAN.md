@@ -98,18 +98,18 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T4.6 | Permanent exercise delete + usage + deleted list | Sonnet | T4.3 | DONE |
 | T4.7 | Phase review, merge | Opus | T4.4–T4.6 | DONE |
 | **Phase 5** | **Web UI**, branch `feat/web` | | | |
-| T5.0 | Settle open UI questions, refine T5.x cards | Opus + dev | T4.7 | TODO |
-| T5.1 | Shell: router, nav, status banner, errors, confirm dialog | Sonnet | T5.0 | TODO |
-| T5.2 | Start screen + exercise picker | Sonnet | T5.1 | TODO |
-| T5.3 | Logging screen | Sonnet | T5.2 | TODO |
-| T5.4 | Finish flow + summary + save as template | Sonnet | T5.3 | TODO |
-| T5.5 | Exercises management (full) | Sonnet | T5.1 | TODO |
-| T5.6 | History + session detail + backfill | Sonnet | T5.1 | TODO |
-| T5.7 | Bodyweight + Gyms screens | Sonnet | T5.1 | TODO |
-| T5.8 | Templates screen + start from template | Sonnet | T5.4 | TODO |
-| T5.9 | Progression chart | Sonnet | T5.1 | TODO |
-| T5.10 | Data screen: export, import, backup | Sonnet | T5.1 | TODO |
-| T5.11 | Phase review, merge | Opus | T5.2–T5.10 | TODO |
+| T5.0 | Settle open UI questions, refine T5.x cards | Opus + dev | T4.7 | DONE |
+| T5.1 | Shell: router, nav, status banner, errors, confirm dialog | Sonnet | T5.0 | DONE |
+| T5.2 | Start screen + exercise picker | Sonnet | T5.1 | DONE |
+| T5.3 | Logging screen | Sonnet | T5.2 | DONE |
+| T5.4 | Finish flow + summary + save as template | Sonnet | T5.3 | DONE |
+| T5.5 | Exercises management (full) | Sonnet | T5.1 | DONE |
+| T5.6 | History + session detail + backfill | Sonnet | T5.1 | DONE |
+| T5.7 | Bodyweight + Gyms screens | Sonnet | T5.1 | DONE |
+| T5.8 | Templates screen + start from template | Sonnet | T5.4 | DONE |
+| T5.9 | Progression chart | Sonnet | T5.1 | DONE |
+| T5.10 | Data screen: export, import, backup | Sonnet | T5.1 | DONE |
+| T5.11 | Phase review, merge | Opus | T5.2–T5.10 | DONE |
 | **Phase 6** | **Hardening + phone access**, branch `chore/hardening` | | | |
 | T6.1 | Full code-quality review → fix list in §8 | Opus | T5.11 | TODO |
 | T6.2 | Apply fix list | Sonnet | T6.1 | TODO |
@@ -631,7 +631,11 @@ Each vertical = model (if not yet present) + port + service + SQLite adapter + c
 
 ### Phase 5 — `feat/web`
 
-**T5.0 UI decisions (Opus + dev).** Settle handoff §8.7 (navigation, chart placement, set-delete gesture, badge fit, template builder) and rewrite T5.1–T5.10 below with concrete layouts. Until then the cards are outlines.
+**T5.0 UI decisions (Opus; dev confirms at final review).** Settled 2026-11-25, see docs/DECISIONS.md "UI structure":
+- Tabs: Workout (`#/workout`, start / running workout / exercise card `#/workout/{exerciseId}` / summary `#/summary/{sessionId}`), Exercises (`#/exercises`, detail + chart `#/exercises/{id}`), History (`#/history`, detail `#/history/{id}`), More (`#/more` → `#/bodyweight`, `#/gyms`, `#/templates`, `#/data`).
+- Exercise card: rows held in a module-level store (`lib/workout.svelte.ts`) keyed by exercise, so drafts survive switching cards; first visit loads ticked sets, else prefill rows, else one blank row. Prefill weights rounded to 2 decimals for the inputs. Cycling a row to W fills `warmupWeight` when the row is unticked. Unit switch converts draft rows and the bodyweight chip; ticked rows keep their unit.
+- Badge: max 4 letters, `text-xs` from 3 letters. Draft rows have a remove button; ticked rows are removed by unticking.
+- Template builder: name + ordered list (up/down/remove) + shared `ExercisePicker`.
 
 - **T5.1 Shell:** nav, hash routes, `/status` banner, `ConfirmDialog`, error display, Tailwind base (44px tap targets, numeric keyboards via `inputmode`).
 - **T5.2 Start + picker:** handoff §8.1, §8.4; gym preselected from `/gyms/active`; resume-or-finish prompt if `/sessions/open` returns a session.
@@ -680,6 +684,7 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
 - Q3 [T4.7] (Opus review) Phase 4 fix list → applied by Opus in the review commit:
   1. Startup recovery treated every SQLite error as corruption, so a locked/unreadable file would have been renamed and replaced by a backup. Now only SQLITE_CORRUPT (11) and SQLITE_NOTADB (26) trigger recovery; anything else stops startup. Test added.
   Accepted as is: import is row by row without one transaction (G7, backup first); a file that cannot be parsed is skipped whole; "line" in import messages is the record number; export builds the ZIP in memory (small personal data).
+- Q4 [T5.11] (Opus review) Phase 5: phone-width (390×844) walkthrough in headless Chromium driven over the DevTools protocol against the real jar (16 steps: empty states, add exercises, start, tick/untick/add set/W cycle, calisthenics bodyweight required, finish with draft warning, summary 500 kg, save as template, prefill on the next workout, discard an empty workout, history + detail, chart, soft delete → re-add → restore dialog, bodyweight/gyms/templates/data, resume-or-finish on reload, no horizontal scroll). All pass, no console errors. Fixes applied: Tailwind v4 default border colour (dividers were near-black), single-value chart centred instead of on the axis, "1 set" plural. The driver script lives outside the repo (not in the contract); rerun recipe in §9.
 - 2026-11-25 T3.8 Opus: Phase 3 review (§8 Q2): running workout's gym locked in history edit; template list loads exercises once. 82 tests pass. Merged to main. DONE.
 - 2026-11-25 T4.1 Opus: CsvCodec.formatRow (quotes only when needed, null → empty) and parse (state machine: quotes, doubled quotes, embedded comma/CR/LF, BOM, CRLF/LF/CR, blank lines skipped, column count vs header, line numbers of the record start; text after a closing quote and unterminated quotes are errors). 7 tests; 89 total pass. DONE.
 - 2026-11-25 T4.2 Opus: HEADER/toCsvRow/fromCsvRow on Exercise (via Exercise.of), Gym, WorkoutSession, WorkoutSet, BodyweightEntry, WorkoutTemplate (ids ';'-joined). CsvCodec gained field helpers (requireColumns, optional, number, optionalNumber, integer, bool, enumValue, instant, date, format, bad); they report file "" line 0 and CsvService fills in the real position. Entity rule violations (InvalidWorkoutInputException) become CorruptedCsvException. Numbers via BigDecimal.toPlainString (no exponent). 94 tests pass. DONE.
@@ -688,3 +693,9 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
 - 2026-11-25 T4.5 Opus: Database.open() runs PRAGMA quick_check on an existing file; damaged → renamed to myophoria.db.corrupt-<time> (with -wal/-shm), backups tried newest first (damaged ones skipped with a warning), none usable → fresh DB + warning. Warnings flow to GET /status (G8). Database.FILE_NAME and backupDir() added; Main uses db.backupDir(). Tests: healthy, restore newest, skip damaged backup, no backup. 110 tests pass. DONE.
 - 2026-11-25 T4.6 Opus: Usage record, ExerciseService(repo, Backups, clock).usage + deletePermanently (only soft-deleted exercises; backup first, failure aborts; returns backup file), SqliteExerciseRepository.deletePermanently (one tx: sets, emptied closed sessions, template rows, exercise; open sessions kept), GET /exercises/{id}/usage, DELETE /exercises/{id}/permanent → {backupFile}. FakeBackups. 115 tests pass. DONE.
 - 2026-11-25 T4.7 Opus: Phase 4 review (§8 Q3): recovery only on corrupt/not-a-database errors. 116 tests pass. Merged to main. DONE.
+- 2026-11-25 T5.0 Opus: UI decisions settled without the developer (they asked not to stop); logged in docs/DECISIONS.md for confirmation at the final review. DONE.
+- 2026-11-25 T5.1 Opus: types.ts mirrors every DTO, api.ts covers every endpoint (FormData for import), format.ts (display rounding, dates, set labels W/1/2/F), router.svelte.ts (hash parts), dialog.svelte.ts (one app-wide choose()/confirmAction()), components ConfirmDialog (<dialog>), Badge (≤4 letters), ErrorText, StatusBanner (/status warnings), NavBar (4 tabs, 56px targets), More screen; app.css .btn/.input/.card with 44px min height and visible focus. web check + build pass. DONE.
+- 2026-11-25 T5.2–T5.4 Opus: one commit (shared store and files): lib/workout.svelte.ts (session, per-exercise cards with draft rows, template queue in localStorage, finishWorkout flow with draft and discard prompts), ExercisePicker (search, chips, inline add), Workout screen (start with gym + optional template / running list / up next / finish), ExerciseCard (W/1/2/F labels cycling, warm-up fill, kg/lb switch converting drafts, tick = POST, untick = DELETE, edit ticked = PUT, row error keeps it unticked, calisthenics bodyweight chip), Summary (kg/lb, save as template), App resume-or-finish prompt. web check + build pass; browser walkthrough in T5.11. DONE.
+- 2026-11-25 T5.5+T5.9 Opus: Exercises (search, chips, active/deleted toggle, add with deleted-twin dialog: restore if same type / erase old with usage counts then create / cancel to rename), ExerciseDetail (edit; type locked once sets exist; soft delete; restore; erase permanently with backup name), ProgressChart (inline SVG, one series, min/max and first/last labels, aria description; 'No added weight logged' when all 0). DONE.
+- 2026-11-25 T5.6–T5.8+T5.10 Opus: History (filters from/to/gym/exercise in a <details>, newest first, backfill form → detail), SessionDetail (edit gym/date/times; gym locked and no end while running; per-exercise set editing with W/F/N select, delete with G6 note, add set incl. bodyweight for calisthenics, delete workout with set count), Bodyweight (add/edit/delete; localDate from the chosen local time), Gyms (add, rename, make default, delete), Templates (builder with up/down/remove + shared picker; Start preselects the template on the start screen), Data (export link, backup, import with per-file report). web check passes. DONE.
+- 2026-11-25 T5.11 Opus: Phase 5 review (§8 Q4). E2E recipe: build web + jar, run jar on a temp MYOPHORIA_DATA_DIR and port 7171, start chromium --headless=new --remote-debugging-port=9333, drive with a Node script (global WebSocket, CDP Runtime.evaluate/Page.captureScreenshot, Emulation 390×844). Merged to main. DONE.

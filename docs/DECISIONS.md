@@ -81,3 +81,7 @@ One entry per decision: date, decision, reason.
 ## 2026-11-25 — Autonomous build mode
 **Decision:** Models build the project through the PLAN.md board without asking the developer to approve code or designs; Opus answers design questions and reviews each phase. The developer reviews and studies the finished program before the defense, supported by docs/DEFENSE.md (T7.4) and a Q&A drill (T7.5).
 **Reason:** Developer's choice; replaces the handoff's "wait for go before every step" agreement.
+
+## 2026-11-25 — UI structure (T5.0, decided by Opus; developer to confirm at final review)
+**Decision:** Bottom tab bar with Workout, Exercises, History and More (Bodyweight, Gyms, Templates, Data). The progression chart lives on an exercise's detail page (Exercises → tap an exercise). Sets are removed by unticking; unticked draft rows have a small "remove" button (no swipe gesture). Initials badges show at most 4 letters, smaller text from 3 letters. The template builder is a name field plus an ordered list with up/down/remove buttons and the shared exercise picker (no drag and drop). History filters: from date, to date, gym, exercise.
+**Reason:** Handoff §8.1 proposed the tab bar; buttons instead of gestures need no library, work with a keyboard and are easy to explain. The developer asked for the build to continue without stopping, so the open UI items were settled with the proposed or simplest accessible option.
