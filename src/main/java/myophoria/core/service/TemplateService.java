@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import myophoria.core.error.InvalidWorkoutInputException;
@@ -20,7 +21,7 @@ import myophoria.core.port.TemplateRepository;
 public class TemplateService {
     private static final String RESOURCE = "template";
     private static final Comparator<WorkoutTemplate> BY_NAME =
-            Comparator.comparing(t -> t.getName().toLowerCase(java.util.Locale.ROOT));
+            Comparator.comparing(t -> t.getName().toLowerCase(Locale.ROOT));
 
     private final TemplateRepository templates;
     private final ExerciseRepository exercises;

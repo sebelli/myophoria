@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.time.Clock;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import myophoria.core.service.BodyweightService;
 import myophoria.core.service.CsvService;
@@ -43,7 +44,7 @@ public class Main {
         Set<String> allowed = new HashSet<>();
         for (String host : env("MYOPHORIA_ALLOWED_HOSTS", "").split(",")) {
             if (!host.isBlank()) {
-                allowed.add(host.trim().toLowerCase(java.util.Locale.ROOT));
+                allowed.add(host.trim().toLowerCase(Locale.ROOT));
             }
         }
         Database db = new Database(dataDir);
@@ -107,7 +108,10 @@ public class Main {
         });
     }
 
-    /** Jackson setup: ISO dates and times; an explicit null number is an error (a missing one is 0, which entity checks reject where 0 is invalid). */
+    /**
+     * Jackson setup: ISO dates and times; an explicit null number is an error (a missing one becomes 0, which the
+     * entity setters reject wherever 0 is invalid).
+     */
     static ObjectMapper jsonMapper() {
         return new ObjectMapper()
                 .registerModule(new JavaTimeModule())
@@ -132,7 +136,7 @@ public class Main {
         if (host == null) {
             return false;
         }
-        host = host.toLowerCase(java.util.Locale.ROOT);
+        host = host.toLowerCase(Locale.ROOT);
         return LOCAL_HOSTS.contains(host) || allowedHosts.contains(host);
     }
 
