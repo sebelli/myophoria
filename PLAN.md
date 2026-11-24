@@ -83,7 +83,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | **Phase 3** | **Core features**, branch `feat/core` | | | |
 | T3.1 | Gyms vertical | Sonnet | T2.6 | TODO |
 | T3.2 | Bodyweight vertical | Sonnet | T2.6 | DONE |
-| T3.3 | Session + set model and repositories | Sonnet | T3.1 | TODO |
+| T3.3 | Session + set model and repositories | Sonnet | T3.1 | DONE |
 | T3.4 | WorkoutService (live flow, prefill) + endpoints | Sonnet | T3.2, T3.3 | TODO |
 | T3.5 | HistoryService + endpoints | Sonnet | T3.4 | TODO |
 | T3.6 | ReportService (summary, progression) + endpoints | Sonnet | T3.4 | TODO |
@@ -695,3 +695,4 @@ Format: `YYYY-MM-DD T<id> <model> <status>: what changed; notes (versions picked
 - 2026-11-25 T2.5 Sonnet: web lib/types.ts, lib/api.ts (ApiError), hash-routed App.svelte, screens/Exercises.svelte (search, type chips, add, soft delete). npm check + build pass; verified create/search through the Vite proxy against the real jar with curl. Not verified: rendering in a browser (no browser run). DONE.
 - 2026-11-25 T2.6 Opus: Phase 2 review; 4 fixes applied (§8 Q1); 32 tests pass with and without a web build. Merged to main, tagged v0.1.0. DONE.
 - 2026-11-25 T3.2 Opus: BodyweightEntry, port, service, SQLite adapter, controller (GET list/latest, POST, PUT, DELETE). Order change: T3.2 → T3.3 → T3.1 (activeGym needs sessions; sessions only need the seeded gym). Shared pieces: Database.format/instant (timestamp text, package-private), Jackson JavaTimeModule + ISO strings + FAIL_ON_NULL_FOR_PRIMITIVES, test ApiTestSupport base. 38 tests pass. DONE.
+- 2026-11-25 T3.3 Opus: WorkoutSet, WorkoutSession (volume, finish, effectiveEnd, duration, setTimes), Session/Set ports, SqliteSessionRepository (sets in one query, grouped by HashMap; delete relies on ON DELETE CASCADE), SqliteSetRepository. Sets load ordered by completed_at, position; position = row number within its exercise. 45 tests pass. DONE.
