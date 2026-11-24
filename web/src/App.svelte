@@ -9,6 +9,7 @@
   import { go } from './lib/router.svelte'
   import { finishWorkout } from './lib/workout.svelte'
   import ExerciseCard from './screens/ExerciseCard.svelte'
+  import ExerciseDetail from './screens/ExerciseDetail.svelte'
   import Exercises from './screens/Exercises.svelte'
   import More from './screens/More.svelte'
   import Summary from './screens/Summary.svelte'
@@ -22,7 +23,11 @@
     more: More,
   }
   const Screen = $derived(
-    route.parts[0] === 'workout' && route.parts[1] ? ExerciseCard : (screens[route.parts[0] ?? ''] ?? Workout),
+    route.parts[0] === 'workout' && route.parts[1]
+      ? ExerciseCard
+      : route.parts[0] === 'exercises' && route.parts[1]
+        ? ExerciseDetail
+        : (screens[route.parts[0] ?? ''] ?? Workout),
   )
 
   // reopening the app mid-workout offers "Resume or finish" (handoff §8.6)

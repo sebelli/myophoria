@@ -103,11 +103,11 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T5.2 | Start screen + exercise picker | Sonnet | T5.1 | DONE |
 | T5.3 | Logging screen | Sonnet | T5.2 | DONE |
 | T5.4 | Finish flow + summary + save as template | Sonnet | T5.3 | DONE |
-| T5.5 | Exercises management (full) | Sonnet | T5.1 | TODO |
+| T5.5 | Exercises management (full) | Sonnet | T5.1 | DONE |
 | T5.6 | History + session detail + backfill | Sonnet | T5.1 | TODO |
 | T5.7 | Bodyweight + Gyms screens | Sonnet | T5.1 | TODO |
 | T5.8 | Templates screen + start from template | Sonnet | T5.4 | TODO |
-| T5.9 | Progression chart | Sonnet | T5.1 | TODO |
+| T5.9 | Progression chart | Sonnet | T5.1 | DONE |
 | T5.10 | Data screen: export, import, backup | Sonnet | T5.1 | TODO |
 | T5.11 | Phase review, merge | Opus | T5.2–T5.10 | TODO |
 | **Phase 6** | **Hardening + phone access**, branch `chore/hardening` | | | |
@@ -695,3 +695,4 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
 - 2026-11-25 T5.0 Opus: UI decisions settled without the developer (they asked not to stop); logged in docs/DECISIONS.md for confirmation at the final review. DONE.
 - 2026-11-25 T5.1 Opus: types.ts mirrors every DTO, api.ts covers every endpoint (FormData for import), format.ts (display rounding, dates, set labels W/1/2/F), router.svelte.ts (hash parts), dialog.svelte.ts (one app-wide choose()/confirmAction()), components ConfirmDialog (<dialog>), Badge (≤4 letters), ErrorText, StatusBanner (/status warnings), NavBar (4 tabs, 56px targets), More screen; app.css .btn/.input/.card with 44px min height and visible focus. web check + build pass. DONE.
 - 2026-11-25 T5.2–T5.4 Opus: one commit (shared store and files): lib/workout.svelte.ts (session, per-exercise cards with draft rows, template queue in localStorage, finishWorkout flow with draft and discard prompts), ExercisePicker (search, chips, inline add), Workout screen (start with gym + optional template / running list / up next / finish), ExerciseCard (W/1/2/F labels cycling, warm-up fill, kg/lb switch converting drafts, tick = POST, untick = DELETE, edit ticked = PUT, row error keeps it unticked, calisthenics bodyweight chip), Summary (kg/lb, save as template), App resume-or-finish prompt. web check + build pass; browser walkthrough in T5.11. DONE.
+- 2026-11-25 T5.5+T5.9 Opus: Exercises (search, chips, active/deleted toggle, add with deleted-twin dialog: restore if same type / erase old with usage counts then create / cancel to rename), ExerciseDetail (edit; type locked once sets exist; soft delete; restore; erase permanently with backup name), ProgressChart (inline SVG, one series, min/max and first/last labels, aria description; 'No added weight logged' when all 0). DONE.
