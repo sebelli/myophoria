@@ -1,86 +1,40 @@
 # UML class diagrams
 
-Status: **design draft from PLAN.md §4 (Gate C, 2026-11-25).** Task T7.1 regenerates these diagrams from the finished code; the final version must match the code exactly.
+Generated from the compiled code on 2026-11-25 (T7.1) with `javap -p`, so every class, field and non-private method below is in the code. Regenerate after any change to a class's members.
 
-Notation: `-` private, `#` protected, `+` public, `$` static, `*` abstract. `?` in a note marks a nullable value.
+Notation: `-` private, `#` protected, `+` public, `~` package-private, `$` static, `*` abstract. Parameters show types only. Left out: private helper methods, lambdas, the generated members of records and enums (`equals`, `hashCode`, `toString`, accessors, `values`, `valueOf`), and nested types (the controllers' request/response records and `CsvService`'s private `Row`/`Tally` helpers). A solid arrow `-->` is a field; a dotted arrow `..>` is a reference by id or a use without a field.
 
-## 1. Domain model (`myophoria.core.model`, `myophoria.core.csv`, `myophoria.core.error`)
+## 1. Domain model (`myophoria.core.model`, `myophoria.core.csv`)
 
 ```mermaid
 classDiagram
   direction TB
 
+  class CsvCodec {
+    +DateTimeFormatter TIMESTAMP$
+    +formatRow(String[]) String$
+    +parse(Reader, String) List~String[]~$
+    +requireColumns(String[], int) void$
+    +optional(String) String$
+    +number(String, String) double$
+    +optionalNumber(String, String) Double$
+    +integer(String, String) int$
+    +bool(String, String) boolean$
+    +enumValue(Class~E~, String, String) E$
+    +instant(String, String) Instant$
+    +date(String, String) LocalDate$
+    +format(double) String$
+    +format(Instant) String$
+    +bad(String) CorruptedCsvException$
+  }
   class CsvSerializable {
     <<interface>>
     +toCsvRow() String[]
   }
-  class VolumeCalculable {
-    <<interface>>
-    +volume(Unit reportingUnit) double
-  }
-
-  class Exercise {
-    <<abstract>>
-    -String id
-    -String name
-    -String nameKey
-    -Laterality laterality
-    -Instant deletedAt
-    #Exercise(String id, String name, Laterality laterality, Instant deletedAt)
-    +of(EquipmentType type, String id, String name, Laterality laterality, Instant deletedAt) Exercise$
-    +nameKey(String name) String$
-    +fromCsvRow(String[] row) Exercise$
-    +type() EquipmentType*
-    +weightLabel() String*
-    +validateWeight(double weight) void
-    +requiresBodyweight() boolean
-    +formatSet(double weight, Unit unit, Double bodyweight) String
-    +warmupWeight(double lastTopWeight) double
-    +initials() String
-    +setName(String name) void
-    +setLaterality(Laterality laterality) void
-    +softDelete(Instant at) void
-    +restore() void
-    +isDeleted() boolean
-    +toCsvRow() String[]
-  }
   class BarbellExercise {
+    +BarbellExercise(String, String, Laterality, Instant)
     +type() EquipmentType
     +weightLabel() String
-  }
-  class DumbbellExercise {
-    +type() EquipmentType
-    +weightLabel() String
-    +formatSet(double weight, Unit unit, Double bodyweight) String
-  }
-  class StackExercise {
-    +type() EquipmentType
-    +weightLabel() String
-  }
-  class PlateLoadedExercise {
-    +type() EquipmentType
-    +weightLabel() String
-  }
-  class CalisthenicsExercise {
-    +type() EquipmentType
-    +weightLabel() String
-    +validateWeight(double weight) void
-    +requiresBodyweight() boolean
-    +formatSet(double weight, Unit unit, Double bodyweight) String
-  }
-
-  class Gym {
-    -String id
-    -String name
-    -String nameKey
-    -boolean isDefault
-    -Instant deletedAt
-    +setName(String name) void
-    +setDefault(boolean isDefault) void
-    +softDelete(Instant at) void
-    +isDeleted() boolean
-    +fromCsvRow(String[] row) Gym$
-    +toCsvRow() String[]
   }
   class BodyweightEntry {
     -String id
@@ -88,10 +42,156 @@ classDiagram
     -Unit unit
     -Instant recordedAt
     -LocalDate localDate
-    +setWeight(double weight) void
-    +setUnit(Unit unit) void
-    +fromCsvRow(String[] row) BodyweightEntry$
+    +String[] HEADER$
+    +BodyweightEntry(String, double, Unit, Instant, LocalDate)
+    +getId() String
+    +getWeight() double
+    +getUnit() Unit
+    +getRecordedAt() Instant
+    +getLocalDate() LocalDate
+    +setWeight(double) void
+    +setUnit(Unit) void
+    +setRecordedAt(Instant) void
+    +setLocalDate(LocalDate) void
     +toCsvRow() String[]
+    +fromCsvRow(String[]) BodyweightEntry$
+  }
+  class CalisthenicsExercise {
+    +CalisthenicsExercise(String, String, Laterality, Instant)
+    +type() EquipmentType
+    +weightLabel() String
+    +validateWeight(double) void
+    +requiresBodyweight() boolean
+    +formatSet(double, Unit, Double) String
+  }
+  class DumbbellExercise {
+    +DumbbellExercise(String, String, Laterality, Instant)
+    +type() EquipmentType
+    +weightLabel() String
+    +formatSet(double, Unit, Double) String
+  }
+  class EquipmentType {
+    <<enum>>
+    BARBELL
+    DUMBBELL
+    STACK
+    PLATE_LOADED
+    CALISTHENICS
+  }
+  class Exercise {
+    <<abstract>>
+    -String id
+    -String name
+    -String nameKey
+    -Laterality laterality
+    -Instant deletedAt
+    +String[] HEADER$
+    #Exercise(String, String, Laterality, Instant)
+    +of(EquipmentType, String, String, Laterality, Instant) Exercise$
+    +nameKey(String) String$
+    +type() EquipmentType*
+    +weightLabel() String*
+    +validateWeight(double) void
+    +requiresBodyweight() boolean
+    +formatSet(double, Unit, Double) String
+    +warmupWeight(double) double
+    +initials() String
+    #formatNumber(double) String$
+    +getId() String
+    +getName() String
+    +getNameKey() String
+    +getLaterality() Laterality
+    +getDeletedAt() Instant
+    +setName(String) void
+    +setLaterality(Laterality) void
+    +softDelete(Instant) void
+    +restore() void
+    +isDeleted() boolean
+    +toCsvRow() String[]
+    +fromCsvRow(String[]) Exercise$
+  }
+  class Gym {
+    +String SEEDED_DEFAULT_ID$
+    -String id
+    -String name
+    -String nameKey
+    -boolean isDefault
+    -Instant deletedAt
+    +String[] HEADER$
+    +Gym(String, String, boolean, Instant)
+    +getId() String
+    +getName() String
+    +getNameKey() String
+    +isDefault() boolean
+    +getDeletedAt() Instant
+    +isDeleted() boolean
+    +setName(String) void
+    +setDefault(boolean) void
+    +softDelete(Instant) void
+    +toCsvRow() String[]
+    +fromCsvRow(String[]) Gym$
+  }
+  class Laterality {
+    <<enum>>
+    BILATERAL
+    UNILATERAL
+  }
+  class PlateLoadedExercise {
+    +PlateLoadedExercise(String, String, Laterality, Instant)
+    +type() EquipmentType
+    +weightLabel() String
+  }
+  class SetType {
+    <<enum>>
+    WARMUP
+    WORKING
+    FAILURE
+    +isWorking() boolean
+  }
+  class StackExercise {
+    +StackExercise(String, String, Laterality, Instant)
+    +type() EquipmentType
+    +weightLabel() String
+  }
+  class Unit {
+    <<enum>>
+    KG
+    LB
+    -double kilograms
+    +convert(double, Unit) double
+    +label() String
+  }
+  class VolumeCalculable {
+    <<interface>>
+    +volume(Unit) double
+  }
+  class WorkoutSession {
+    -String id
+    -String gymId
+    -LocalDate localDate
+    -Instant startedAt
+    -Instant endedAt
+    -boolean open
+    -List~WorkoutSet~ sets
+    +String[] HEADER$
+    +WorkoutSession(String, String, LocalDate, Instant, Instant, boolean)
+    +volume(Unit) double
+    +finish(Instant) void
+    +effectiveEnd() Instant
+    +duration() Duration
+    +addSet(WorkoutSet) void
+    +getSets() List~WorkoutSet~
+    +getId() String
+    +getGymId() String
+    +getLocalDate() LocalDate
+    +getStartedAt() Instant
+    +getEndedAt() Instant
+    +isOpen() boolean
+    +setGymId(String) void
+    +setLocalDate(LocalDate) void
+    +setTimes(Instant, Instant) void
+    +toCsvRow() String[]
+    +fromCsvRow(String[]) WorkoutSession$
   }
   class WorkoutSet {
     -String id
@@ -104,383 +204,614 @@ classDiagram
     -int reps
     -Double bodyweight
     -Instant completedAt
-    +volume(Unit reportingUnit) double
-    +fromCsvRow(String[] row) WorkoutSet$
+    +String[] HEADER$
+    +WorkoutSet(String, String, String, int, SetType, double, Unit, int, Double, Instant)
+    +volume(Unit) double
+    +weightIn(Unit) double
+    +getId() String
+    +getSessionId() String
+    +getExerciseId() String
+    +getPosition() int
+    +getSetType() SetType
+    +getWeight() double
+    +getUnit() Unit
+    +getReps() int
+    +getBodyweight() Double
+    +getCompletedAt() Instant
+    +setExerciseId(String) void
+    +setPosition(int) void
+    +setSetType(SetType) void
+    +setWeight(double) void
+    +setUnit(Unit) void
+    +setReps(int) void
+    +setBodyweight(Double) void
+    +setCompletedAt(Instant) void
     +toCsvRow() String[]
-  }
-  class WorkoutSession {
-    -String id
-    -String gymId
-    -LocalDate localDate
-    -Instant startedAt
-    -Instant endedAt
-    -boolean open
-    -List~WorkoutSet~ sets
-    +volume(Unit reportingUnit) double
-    +finish(Instant now) void
-    +effectiveEnd() Instant
-    +duration() Duration
-    +fromCsvRow(String[] row) WorkoutSession$
-    +toCsvRow() String[]
+    +fromCsvRow(String[]) WorkoutSet$
   }
   class WorkoutTemplate {
     -String id
     -String name
     -List~String~ exerciseIds
-    +setName(String name) void
-    +setExerciseIds(List~String~ ids) void
-    +fromCsvRow(String[] row) WorkoutTemplate$
+    +String[] HEADER$
+    +WorkoutTemplate(String, String, List~String~)
+    +getId() String
+    +getName() String
+    +getExerciseIds() List~String~
+    +setName(String) void
+    +setExerciseIds(List~String~) void
     +toCsvRow() String[]
-  }
-
-  class EquipmentType {
-    <<enumeration>>
-    BARBELL
-    DUMBBELL
-    STACK
-    PLATE_LOADED
-    CALISTHENICS
-  }
-  class Laterality {
-    <<enumeration>>
-    BILATERAL
-    UNILATERAL
-  }
-  class SetType {
-    <<enumeration>>
-    WARMUP
-    WORKING
-    FAILURE
-    +isWorking() boolean
-  }
-  class Unit {
-    <<enumeration>>
-    KG
-    LB
-    -double kgPerUnit
-    +convert(double value, Unit to) double
-  }
-
-  class CsvCodec {
-    <<utility>>
-    +TIMESTAMP DateTimeFormatter$
-    +formatRow(String[] fields) String$
-    +parse(Reader in, String fileName) List~String[]~$
+    +fromCsvRow(String[]) WorkoutTemplate$
   }
 
   Exercise <|-- BarbellExercise
-  Exercise <|-- DumbbellExercise
-  Exercise <|-- StackExercise
-  Exercise <|-- PlateLoadedExercise
-  Exercise <|-- CalisthenicsExercise
-
-  CsvSerializable <|.. Exercise
-  CsvSerializable <|.. Gym
   CsvSerializable <|.. BodyweightEntry
-  CsvSerializable <|.. WorkoutSet
-  CsvSerializable <|.. WorkoutSession
-  CsvSerializable <|.. WorkoutTemplate
-  VolumeCalculable <|.. WorkoutSet
-  VolumeCalculable <|.. WorkoutSession
-
-  WorkoutSession "1" *-- "0..*" WorkoutSet : sets
-  WorkoutSet ..> Exercise : exerciseId
-  WorkoutSession ..> Gym : gymId
-  WorkoutTemplate ..> Exercise : exerciseIds
-
+  BodyweightEntry --> Unit
+  Exercise <|-- CalisthenicsExercise
+  Exercise <|-- DumbbellExercise
+  CsvSerializable <|.. Exercise
   Exercise --> Laterality
-  Exercise ..> EquipmentType
+  CsvSerializable <|.. Gym
+  Exercise <|-- PlateLoadedExercise
+  Exercise <|-- StackExercise
+  VolumeCalculable <|.. WorkoutSession
+  CsvSerializable <|.. WorkoutSession
+  WorkoutSession --> "*" WorkoutSet
+  VolumeCalculable <|.. WorkoutSet
+  CsvSerializable <|.. WorkoutSet
   WorkoutSet --> SetType
   WorkoutSet --> Unit
-  BodyweightEntry --> Unit
+  CsvSerializable <|.. WorkoutTemplate
+  WorkoutSet ..> Exercise : exerciseId
+  WorkoutSet ..> WorkoutSession : sessionId
+  WorkoutSession ..> Gym : gymId
+  WorkoutTemplate ..> Exercise : exerciseIds
+  Exercise ..> EquipmentType : type()
   CsvSerializable ..> CsvCodec : rows formatted by
-
-  note for Exercise "of() is the only EquipmentType-to-subclass switch.\nSetters throw InvalidWorkoutInputException."
-  note for WorkoutSet "WARMUP sets have volume 0.\nbodyweight is nullable, in the set's unit."
 ```
 
-### Exceptions
+## 2. Exceptions (`myophoria.core.error`)
 
 ```mermaid
 classDiagram
-  class RuntimeException
-  class Exception
-  class InvalidWorkoutInputException {
-    +InvalidWorkoutInputException(String message)
-  }
-  class NotFoundException {
-    -String resourceType
-    -String id
+  direction TB
+
+  class CorruptedCsvException {
+    -String file
+    -int line
+    -String reason
+    +CorruptedCsvException(String, int, String)
+    +getFile() String
+    +getLine() int
+    +getReason() String
   }
   class DuplicateResourceException {
     -String resourceType
     -String existingId
     -boolean softDeleted
+    +DuplicateResourceException(String, String, boolean)
+    +getResourceType() String
+    +getExistingId() String
+    +isSoftDeleted() boolean
   }
-  class CorruptedCsvException {
-    -String file
-    -int line
-    -String reason
+  class InvalidWorkoutInputException {
+    +InvalidWorkoutInputException(String)
   }
+  class NotFoundException {
+    -String resourceType
+    -String id
+    +NotFoundException(String, String)
+    +getResourceType() String
+    +getId() String
+  }
+
+  Exception <|-- CorruptedCsvException
+  RuntimeException <|-- DuplicateResourceException
   RuntimeException <|-- InvalidWorkoutInputException
   RuntimeException <|-- NotFoundException
-  RuntimeException <|-- DuplicateResourceException
-  Exception <|-- CorruptedCsvException
-
-  note for CorruptedCsvException "Checked: CsvService catches it per row and reports it.\nThe others are unchecked and reach ErrorHandlers (400, 404, 409)."
 ```
 
-## 2. Ports and services (`myophoria.core.port`, `myophoria.core.service`)
+`CorruptedCsvException` is checked: a broken CSV file is an expected, recoverable condition the importer must handle. The other three are unchecked and are mapped to HTTP status codes by `ErrorHandlers`.
+
+## 3. Ports (`myophoria.core.port`)
+
+The interfaces the core needs from the outside. `myophoria.persistence` implements them (section 6).
 
 ```mermaid
 classDiagram
-  direction LR
+  direction TB
 
-  class ExerciseRepository {
-    <<interface>>
-    +findAll() List~Exercise~
-    +findById(String id) Exercise
-    +insert(Exercise e) void
-    +update(Exercise e) void
-    +countSets(String exerciseId) int
-    +countSessions(String exerciseId) int
-    +deletePermanently(String id) void
-  }
-  class GymRepository {
-    <<interface>>
-    +findAll() List~Gym~
-    +findById(String id) Gym
-    +insert(Gym g) void
-    +update(Gym g) void
-    +makeDefault(String id) void
-  }
-  class SessionRepository {
-    <<interface>>
-    +findAll() List~WorkoutSession~
-    +findById(String id) WorkoutSession
-    +findOpen() WorkoutSession
-    +insert(WorkoutSession s) void
-    +update(WorkoutSession s) void
-    +delete(String id) void
-  }
-  class SetRepository {
-    <<interface>>
-    +findById(String id) WorkoutSet
-    +insert(WorkoutSet s) void
-    +update(WorkoutSet s) void
-    +delete(String id) void
-  }
-  class BodyweightRepository {
-    <<interface>>
-    +findAll() List~BodyweightEntry~
-    +findById(String id) BodyweightEntry
-    +insert(BodyweightEntry b) void
-    +update(BodyweightEntry b) void
-    +delete(String id) void
-  }
-  class TemplateRepository {
-    <<interface>>
-    +findAll() List~WorkoutTemplate~
-    +findById(String id) WorkoutTemplate
-    +insert(WorkoutTemplate t) void
-    +update(WorkoutTemplate t) void
-    +delete(String id) void
-  }
   class Backups {
     <<interface>>
     +createBackup() String
   }
+  class BodyweightRepository {
+    <<interface>>
+    +findAll() List~BodyweightEntry~
+    +findById(String) BodyweightEntry
+    +insert(BodyweightEntry) void
+    +update(BodyweightEntry) void
+    +delete(String) void
+  }
+  class ExerciseRepository {
+    <<interface>>
+    +findAll() List~Exercise~
+    +findById(String) Exercise
+    +insert(Exercise) void
+    +update(Exercise) void
+    +countSets(String) int
+    +countSessions(String) int
+    +deletePermanently(String) void
+  }
+  class GymRepository {
+    <<interface>>
+    +findAll() List~Gym~
+    +findById(String) Gym
+    +insert(Gym) void
+    +update(Gym) void
+    +makeDefault(String) void
+  }
+  class SessionRepository {
+    <<interface>>
+    +findAll() List~WorkoutSession~
+    +findById(String) WorkoutSession
+    +findOpen() WorkoutSession
+    +insert(WorkoutSession) void
+    +update(WorkoutSession) void
+    +delete(String) void
+  }
+  class SetRepository {
+    <<interface>>
+    +findById(String) WorkoutSet
+    +insert(WorkoutSet) void
+    +update(WorkoutSet) void
+    +delete(String) void
+  }
+  class TemplateRepository {
+    <<interface>>
+    +findAll() List~WorkoutTemplate~
+    +findById(String) WorkoutTemplate
+    +insert(WorkoutTemplate) void
+    +update(WorkoutTemplate) void
+    +delete(String) void
+  }
 
+
+```
+
+## 4. Services (`myophoria.core.service`)
+
+```mermaid
+classDiagram
+  direction TB
+
+  class BodyweightService {
+    -String RESOURCE$
+    +Comparator~BodyweightEntry~ NEWEST_FIRST$
+    -BodyweightRepository entries
+    +BodyweightService(BodyweightRepository)
+    +list() List~BodyweightEntry~
+    +latest() BodyweightEntry
+    +create(double, Unit, Instant, LocalDate) BodyweightEntry
+    +update(String, double, Unit, Instant, LocalDate) BodyweightEntry
+    +delete(String) void
+  }
+  class CsvService {
+    +String FORMAT_VERSION$
+    ~String[] MANIFEST_HEADER$
+    ~long MAX_UNZIPPED_BYTES$
+    -GymRepository gyms
+    -ExerciseRepository exercises
+    -SessionRepository sessions
+    -SetRepository sets
+    -BodyweightRepository bodyweights
+    -TemplateRepository templates
+    -Backups backups
+    -Clock clock
+    +CsvService(GymRepository, ExerciseRepository, SessionRepository, SetRepository, BodyweightRepository, TemplateRepository, Backups, Clock)
+    +export(OutputStream) void
+    +importZip(InputStream) ImportReport
+  }
   class ExerciseService {
+    -String RESOURCE$
+    -Comparator~Exercise~ BY_NAME$
     -ExerciseRepository exercises
     -Backups backups
     -Clock clock
-    +search(String query, Set~EquipmentType~ types, boolean deleted) List~Exercise~
-    +get(String id) Exercise
-    +create(String name, EquipmentType type, Laterality laterality) Exercise
-    +update(String id, String name, EquipmentType type, Laterality laterality) Exercise
-    +softDelete(String id) void
-    +restore(String id) Exercise
-    +usage(String id) Usage
-    +deletePermanently(String id) String
+    +ExerciseService(ExerciseRepository, Backups, Clock)
+    +search(String, Set~EquipmentType~, boolean) List~Exercise~
+    +get(String) Exercise
+    +allById() Map~String, Exercise~
+    +create(String, EquipmentType, Laterality) Exercise
+    +update(String, String, EquipmentType, Laterality) Exercise
+    +softDelete(String) Exercise
+    +restore(String) Exercise
+    +usage(String) Usage
+    +deletePermanently(String) String
   }
   class GymService {
+    -String RESOURCE$
+    -Comparator~Gym~ BY_NAME$
+    +Comparator~WorkoutSession~ CHRONOLOGICAL$
     -GymRepository gyms
     -SessionRepository sessions
     -Clock clock
+    +GymService(GymRepository, SessionRepository, Clock)
     +list() List~Gym~
-    +create(String name) Gym
-    +rename(String id, String name) Gym
-    +makeDefault(String id) Gym
-    +delete(String id) void
+    +get(String) Gym
+    +create(String) Gym
+    +rename(String, String) Gym
+    +makeDefault(String) Gym
+    +delete(String) void
     +activeGym() Gym
   }
-  class WorkoutService {
-    -SessionRepository sessions
-    -SetRepository sets
-    -ExerciseRepository exercises
-    -GymRepository gyms
-    -BodyweightRepository bodyweights
-    -Clock clock
-    +open() WorkoutSession
-    +start(String gymId, LocalDate localDate) WorkoutSession
-    +finish(String id) WorkoutSession
-    +addSet(String sessionId, SetInput input) WorkoutSet
-    +updateSet(String id, SetInput input) WorkoutSet
-    +deleteSet(String id) void
-    +prefill(String sessionId, String exerciseId) Prefill
-  }
   class HistoryService {
+    +Comparator~WorkoutSession~ NEWEST_FIRST$
     -SessionRepository sessions
     -GymRepository gyms
-    +list(HistoryFilter filter) List~WorkoutSession~
-    +get(String id) WorkoutSession
-    +backfill(String gymId, LocalDate localDate, Instant startedAt, Instant endedAt) WorkoutSession
-    +edit(String id, String gymId, LocalDate localDate, Instant startedAt, Instant endedAt) WorkoutSession
-    +delete(String id) void
+    +HistoryService(SessionRepository, GymRepository)
+    +list(HistoryFilter) List~SessionHeader~
+    +get(String) WorkoutSession
+    +backfill(String, LocalDate, Instant, Instant) WorkoutSession
+    +edit(String, String, LocalDate, Instant, Instant) WorkoutSession
+    +delete(String) void
   }
   class ReportService {
     -SessionRepository sessions
     -ExerciseRepository exercises
-    +summary(String sessionId, Unit unit) SessionSummary
-    +progression(String exerciseId, Unit unit) List~ProgressPoint~
-  }
-  class BodyweightService {
-    -BodyweightRepository entries
-    +list() List~BodyweightEntry~
-    +latest() BodyweightEntry
-    +create(double weight, Unit unit, Instant recordedAt, LocalDate localDate) BodyweightEntry
-    +update(String id, double weight, Unit unit, Instant recordedAt, LocalDate localDate) BodyweightEntry
-    +delete(String id) void
+    +ReportService(SessionRepository, ExerciseRepository)
+    +summary(String, Unit) SessionSummary
+    +progression(String, Unit) List~ProgressPoint~
   }
   class TemplateService {
+    -String RESOURCE$
+    -Comparator~WorkoutTemplate~ BY_NAME$
     -TemplateRepository templates
     -ExerciseRepository exercises
     -SessionRepository sessions
+    +TemplateService(TemplateRepository, ExerciseRepository, SessionRepository)
     +list() List~WorkoutTemplate~
-    +create(String name, List~String~ exerciseIds) WorkoutTemplate
-    +update(String id, String name, List~String~ exerciseIds) WorkoutTemplate
-    +delete(String id) void
-    +saveFromSession(String sessionId, String name) WorkoutTemplate
+    +create(String, List~String~) WorkoutTemplate
+    +update(String, String, List~String~) WorkoutTemplate
+    +delete(String) void
+    +saveFromSession(String, String) WorkoutTemplate
   }
-  class CsvService {
-    -ExerciseRepository exercises
-    -GymRepository gyms
+  class WorkoutService {
+    -Comparator~WorkoutSet~ BY_POSITION$
     -SessionRepository sessions
     -SetRepository sets
+    -ExerciseRepository exercises
+    -GymRepository gyms
     -BodyweightRepository bodyweights
-    -TemplateRepository templates
-    -Backups backups
     -Clock clock
-    +export(OutputStream out) void
-    +importZip(InputStream in) ImportReport
+    +WorkoutService(SessionRepository, SetRepository, ExerciseRepository, GymRepository, BodyweightRepository, Clock)
+    +open() WorkoutSession
+    +start(String, LocalDate) WorkoutSession
+    +finish(String) WorkoutSession
+    +addSet(String, SetInput) WorkoutSet
+    +updateSet(String, SetInput) WorkoutSet
+    +deleteSet(String) void
+    +prefill(String, String) Prefill
   }
 
+  BodyweightService --> BodyweightRepository
+  CsvService --> GymRepository
+  CsvService --> ExerciseRepository
+  CsvService --> SessionRepository
+  CsvService --> SetRepository
+  CsvService --> BodyweightRepository
+  CsvService --> TemplateRepository
+  CsvService --> Backups
   ExerciseService --> ExerciseRepository
   ExerciseService --> Backups
   GymService --> GymRepository
   GymService --> SessionRepository
+  HistoryService --> SessionRepository
+  HistoryService --> GymRepository
+  ReportService --> SessionRepository
+  ReportService --> ExerciseRepository
+  TemplateService --> TemplateRepository
+  TemplateService --> ExerciseRepository
+  TemplateService --> SessionRepository
   WorkoutService --> SessionRepository
   WorkoutService --> SetRepository
   WorkoutService --> ExerciseRepository
   WorkoutService --> GymRepository
   WorkoutService --> BodyweightRepository
-  HistoryService --> SessionRepository
-  HistoryService --> GymRepository
-  ReportService --> SessionRepository
-  ReportService --> ExerciseRepository
-  BodyweightService --> BodyweightRepository
-  TemplateService --> TemplateRepository
-  TemplateService --> ExerciseRepository
-  TemplateService --> SessionRepository
-  CsvService --> Backups
-
-  note for ExerciseService "HashMap~String, Exercise~ keyed by nameKey for duplicate checks.\nEnumSet filter; ArrayList sorted by name."
-  note for ReportService "LinkedHashMap~String, List~WorkoutSet~~ groups sets per exercise in first-set order."
-  note for CsvService "HashSet~String~ of imported IDs per file to detect orphans.\nCatches CorruptedCsvException per row; finally deletes the temp file."
-  note for WorkoutService "ArrayList filtering over sessions for prefill, unit memory and warm-up."
 ```
 
-`CsvService` also uses every other repository; those arrows are left out for readability.
-
-### Service result records
-
-| Record | Fields |
-|---|---|
-| `SetInput` | `exerciseId, setType, weight, unit, reps, bodyweight?, position` |
-| `Prefill` | `unit, List<PrefillRow> rows, warmupWeight?, bodyweight?` |
-| `PrefillRow` | `setType, weight, reps` |
-| `HistoryFilter` | `from?, to?, gymId?, exerciseId?` |
-| `SessionSummary` | `totalSets, workingSets, totalVolume, List<ExerciseSummary> exercises, startedAt?, endedAt?, duration?` |
-| `ExerciseSummary` | `exerciseId, name, workingSets, topWeight, averageWeight, volume` |
-| `ProgressPoint` | `localDate, topWeight` |
-| `Usage` | `sets, sessions` |
-| `ImportReport` | `Map<String, FileReport> files` |
-| `FileReport` | `imported, alreadyPresent, List<String> skipped, List<String> orphans, List<String> nameConflicts` |
-
-## 3. Adapters (`myophoria.persistence`, `myophoria.api`)
+## 5. Service inputs and results (records in `myophoria.core.service`)
 
 ```mermaid
 classDiagram
-  direction LR
+  direction TB
 
-  class Database {
-    -Path dataDir
-    +open() List~String~
-    +connect() Connection
+  class ExerciseSummary {
+    <<record>>
+    +String exerciseId
+    +String name
+    +int workingSets
+    +Double topWeight
+    +Double averageWeight
+    +double volume
   }
-  class Migrator {
-    +migrate(Connection connection) void$
+  class FileReport {
+    <<record>>
+    +int imported
+    +int alreadyPresent
+    +List~String~ skipped
+    +List~String~ orphans
+    +List~String~ nameConflicts
+    +List~String~ adjusted
   }
-  class SqliteExerciseRepository
-  class SqliteGymRepository
-  class SqliteSessionRepository
-  class SqliteSetRepository
-  class SqliteBodyweightRepository
-  class SqliteTemplateRepository
-  class SqliteBackups {
-    -Database database
-    -Path backupDir
-    +createBackup() String
+  class HistoryFilter {
+    <<record>>
+    +LocalDate from
+    +LocalDate to
+    +String gymId
+    +String exerciseId
+  }
+  class ImportReport {
+    <<record>>
+    +Map~String, FileReport~ files
+  }
+  class Prefill {
+    <<record>>
+    +Unit unit
+    +List~PrefillRow~ rows
+    +Double warmupWeight
+    +Double bodyweight
+  }
+  class PrefillRow {
+    <<record>>
+    +SetType setType
+    +double weight
+    +int reps
+  }
+  class ProgressPoint {
+    <<record>>
+    +LocalDate localDate
+    +double topWeight
+  }
+  class SessionHeader {
+    <<record>>
+    +String id
+    +String gymName
+    +LocalDate localDate
+    +Instant startedAt
+    +Instant endedAt
+    +int setCount
+    +boolean open
+  }
+  class SessionSummary {
+    <<record>>
+    +String sessionId
+    +LocalDate localDate
+    +Instant startedAt
+    +Instant endedAt
+    +Long durationSeconds
+    +Unit unit
+    +int totalSets
+    +int workingSets
+    +double volume
+    +List~ExerciseSummary~ exercises
+  }
+  class SetInput {
+    <<record>>
+    +String exerciseId
+    +SetType setType
+    +double weight
+    +Unit unit
+    +int reps
+    +Double bodyweight
+    +int position
+  }
+  class Usage {
+    <<record>>
+    +int sets
+    +int sessions
   }
 
-  ExerciseRepository <|.. SqliteExerciseRepository
-  GymRepository <|.. SqliteGymRepository
-  SessionRepository <|.. SqliteSessionRepository
-  SetRepository <|.. SqliteSetRepository
-  BodyweightRepository <|.. SqliteBodyweightRepository
-  TemplateRepository <|.. SqliteTemplateRepository
-  Backups <|.. SqliteBackups
-  Database ..> Migrator
-  SqliteExerciseRepository --> Database
-  SqliteBackups --> Database
-
-  class Main {
-    +main(String[] args) void$
-  }
-  class ErrorHandlers
-  class ExerciseController
-  class GymController
-  class WorkoutController
-  class HistoryController
-  class ReportController
-  class BodyweightController
-  class TemplateController
-  class DataController
-
-  Main ..> Database : opens, migrates, recovers
-  Main ..> ErrorHandlers
-  ExerciseController --> ExerciseService
-  GymController --> GymService
-  WorkoutController --> WorkoutService
-  HistoryController --> HistoryService
-  ReportController --> ReportService
-  BodyweightController --> BodyweightService
-  TemplateController --> TemplateService
-  DataController --> CsvService
-  DataController --> Backups
-
-  note for Main "Reads MYOPHORIA_PORT, MYOPHORIA_DATA_DIR, MYOPHORIA_ALLOWED_HOSTS.\nWires adapters into services into controllers; Host/Origin guard."
+  Prefill --> Unit
+  Prefill --> "*" PrefillRow
+  PrefillRow --> SetType
+  SessionSummary --> Unit
+  SessionSummary --> "*" ExerciseSummary
+  SetInput --> SetType
+  SetInput --> Unit
+  ImportReport --> "*" FileReport : files
 ```
 
-Every SQLite repository holds a `Database` and opens one connection per call; only two of those arrows are drawn. Controllers declare their request and response records as nested types.
+## 6. Persistence adapters (`myophoria.persistence`)
+
+```mermaid
+classDiagram
+  direction TB
+
+  class Database {
+    +String FILE_NAME$
+    -int SQLITE_CORRUPT$
+    -int SQLITE_NOTADB$
+    -String url
+    -Path dataDir
+    +Database(Path)
+    +backupDir() Path
+    +open() List~String~
+    +connect() Connection
+    ~format(Instant) String$
+    ~instant(String) Instant$
+  }
+  class Migrator {
+    -List~String~ SCRIPTS$
+    +migrate(Connection) void$
+  }
+  class SqliteBackups {
+    +DateTimeFormatter FILE_TIME$
+    -Database db
+    -Path backupDir
+    -Clock clock
+    +SqliteBackups(Database, Path, Clock)
+    +createBackup() String
+  }
+  class SqliteBodyweightRepository {
+    -String SELECT$
+    -Database db
+    +SqliteBodyweightRepository(Database)
+    +findAll() List~BodyweightEntry~
+    +findById(String) BodyweightEntry
+    +insert(BodyweightEntry) void
+    +update(BodyweightEntry) void
+    +delete(String) void
+  }
+  class SqliteExerciseRepository {
+    -String COLUMNS$
+    -Database db
+    +SqliteExerciseRepository(Database)
+    +findAll() List~Exercise~
+    +findById(String) Exercise
+    +insert(Exercise) void
+    +update(Exercise) void
+    +countSets(String) int
+    +countSessions(String) int
+    +deletePermanently(String) void
+  }
+  class SqliteGymRepository {
+    -String SELECT$
+    -Database db
+    +SqliteGymRepository(Database)
+    +findAll() List~Gym~
+    +findById(String) Gym
+    +insert(Gym) void
+    +update(Gym) void
+    +makeDefault(String) void
+  }
+  class SqliteSessionRepository {
+    -String SELECT$
+    -String SET_ORDER$
+    -Database db
+    +SqliteSessionRepository(Database)
+    +findAll() List~WorkoutSession~
+    +findById(String) WorkoutSession
+    +findOpen() WorkoutSession
+    +insert(WorkoutSession) void
+    +update(WorkoutSession) void
+    +delete(String) void
+  }
+  class SqliteSetRepository {
+    ~String SELECT$
+    -Database db
+    +SqliteSetRepository(Database)
+    +findById(String) WorkoutSet
+    +insert(WorkoutSet) void
+    +update(WorkoutSet) void
+    +delete(String) void
+    ~map(ResultSet) WorkoutSet$
+  }
+  class SqliteTemplateRepository {
+    -Database db
+    +SqliteTemplateRepository(Database)
+    +findAll() List~WorkoutTemplate~
+    +findById(String) WorkoutTemplate
+    +insert(WorkoutTemplate) void
+    +update(WorkoutTemplate) void
+    +delete(String) void
+  }
+
+  Backups <|.. SqliteBackups
+  SqliteBackups --> Database
+  BodyweightRepository <|.. SqliteBodyweightRepository
+  SqliteBodyweightRepository --> Database
+  ExerciseRepository <|.. SqliteExerciseRepository
+  SqliteExerciseRepository --> Database
+  GymRepository <|.. SqliteGymRepository
+  SqliteGymRepository --> Database
+  SessionRepository <|.. SqliteSessionRepository
+  SqliteSessionRepository --> Database
+  SetRepository <|.. SqliteSetRepository
+  SqliteSetRepository --> Database
+  TemplateRepository <|.. SqliteTemplateRepository
+  SqliteTemplateRepository --> Database
+  Database ..> Migrator : open() runs
+```
+
+## 7. HTTP adapters and bootstrap (`myophoria.api`)
+
+```mermaid
+classDiagram
+  direction TB
+
+  class BodyweightController {
+    -BodyweightService service
+    +BodyweightController(BodyweightService)
+    +register(RoutesConfig) void
+  }
+  class DataController {
+    -List~String~ warnings
+    -Backups backups
+    -CsvService csv
+    +DataController(List~String~, Backups, CsvService)
+    +register(RoutesConfig) void
+  }
+  class ErrorHandlers {
+    -Logger LOG$
+    +register(JavalinConfig) void$
+  }
+  class ExerciseController {
+    -ExerciseService service
+    +ExerciseController(ExerciseService)
+    +register(RoutesConfig) void
+  }
+  class GymController {
+    -GymService service
+    +GymController(GymService)
+    +register(RoutesConfig) void
+  }
+  class HistoryController {
+    -HistoryService history
+    -ExerciseService exercises
+    +HistoryController(HistoryService, ExerciseService)
+    +register(RoutesConfig) void
+  }
+  class Main {
+    -Set~String~ LOCAL_HOSTS$
+    +Main()
+    +main(String[]) void$
+    ~createApp(Database, Path, List~String~, Set~String~) Javalin$
+    ~jsonMapper() ObjectMapper$
+    ~hostAllowed(String, boolean, Set~String~) boolean$
+  }
+  class ReportController {
+    -ReportService reports
+    +ReportController(ReportService)
+    +register(RoutesConfig) void
+    ~unit(String) Unit$
+  }
+  class TemplateController {
+    -TemplateService templates
+    -ExerciseService exercises
+    +TemplateController(TemplateService, ExerciseService)
+    +register(RoutesConfig) void
+  }
+  class WorkoutController {
+    -WorkoutService workouts
+    -ExerciseService exercises
+    +WorkoutController(WorkoutService, ExerciseService)
+    +register(RoutesConfig) void
+  }
+
+  BodyweightController --> BodyweightService
+  DataController --> Backups
+  DataController --> CsvService
+  ExerciseController --> ExerciseService
+  GymController --> GymService
+  HistoryController --> HistoryService
+  HistoryController --> ExerciseService
+  ReportController --> ReportService
+  TemplateController --> TemplateService
+  TemplateController --> ExerciseService
+  WorkoutController --> WorkoutService
+  WorkoutController --> ExerciseService
+  Main ..> Database : opens
+  Main ..> ErrorHandlers : registers
+  Main ..> DataController : wires every controller
+```

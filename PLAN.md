@@ -115,7 +115,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T6.2 | Apply fix list | Sonnet | T6.1 | DONE |
 | T6.3 | Tailscale serve + phone test | Sonnet + dev | T6.2 | TODO |
 | **Phase 7** | **Docs and demo**, branch `docs/final`, tag `v1.0.0` | | | |
-| T7.1 | UML from code (`docs/uml/classes.md`) | Sonnet | T6.2 | TODO |
+| T7.1 | UML from code (`docs/uml/classes.md`) | Sonnet | T6.2 | DONE |
 | T7.2 | DESIGN, API, DATA_FORMAT, DECISIONS | Sonnet | T7.1 | TODO |
 | T7.3 | README + Javadoc completeness | Sonnet | T7.2 | TODO |
 | T7.4 | Demo script + defense study guide | Sonnet | T7.3 | TODO |
@@ -703,3 +703,4 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
 - 2026-11-25 T6.1 Opus: full review + rubric map (§8 Q5). DONE.
 - 2026-11-25 T6.2 Opus: applied Q5 fixes; 116 tests green. DONE.
 - 2026-11-25 T6.3 Opus: README documents `tailscale serve` + MYOPHORIA_ALLOWED_HOSTS. Phone test still needs the developer; status stays TODO.
+- 2026-11-25 T7.1 Opus: docs/uml/classes.md generated from javap -p of target/classes (7 diagrams, all render with mermaid-cli 11.4.2). DONE.
