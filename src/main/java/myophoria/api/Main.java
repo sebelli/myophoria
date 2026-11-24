@@ -18,6 +18,7 @@ import myophoria.core.service.BodyweightService;
 import myophoria.core.service.ExerciseService;
 import myophoria.core.service.GymService;
 import myophoria.core.service.HistoryService;
+import myophoria.core.service.ReportService;
 import myophoria.core.service.WorkoutService;
 import myophoria.persistence.Database;
 import myophoria.persistence.SqliteBodyweightRepository;
@@ -57,6 +58,7 @@ public class Main {
         WorkoutService workouts = new WorkoutService(sessionRepo, new SqliteSetRepository(db), exerciseRepo, gymRepo,
                 bodyweightRepo, clock);
         WorkoutController workoutController = new WorkoutController(workouts, exercises);
+        ReportController reportController = new ReportController(new ReportService(sessionRepo, exerciseRepo));
         HistoryController historyController = new HistoryController(new HistoryService(sessionRepo, gymRepo), exercises);
         GymController gymController = new GymController(new GymService(gymRepo, sessionRepo, clock));
         ExerciseController exerciseController = new ExerciseController(exercises);
@@ -83,6 +85,7 @@ public class Main {
             gymController.register(config.routes);
             workoutController.register(config.routes); // before history routes: /sessions/open vs /sessions/{id}
             historyController.register(config.routes);
+            reportController.register(config.routes);
         });
     }
 
