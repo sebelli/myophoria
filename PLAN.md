@@ -117,7 +117,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | **Phase 7** | **Docs and demo**, branch `docs/final`, tag `v1.0.0` | | | |
 | T7.1 | UML from code (`docs/uml/classes.md`) | Sonnet | T6.2 | DONE |
 | T7.2 | DESIGN, API, DATA_FORMAT, DECISIONS | Sonnet | T7.1 | DONE |
-| T7.3 | README + Javadoc completeness | Sonnet | T7.2 | TODO |
+| T7.3 | README + Javadoc completeness | Sonnet | T7.2 | DONE |
 | T7.4 | Demo script + defense study guide | Sonnet | T7.3 | TODO |
 | T7.5 | Q&A drill with the developer | Haiku | T7.4 | TODO |
 | T7.6 | Final review, merge, tag | Opus | T7.5 | TODO |
@@ -705,3 +705,4 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
 - 2026-11-25 T6.3 Opus: README documents `tailscale serve` + MYOPHORIA_ALLOWED_HOSTS. Phone test still needs the developer; status stays TODO.
 - 2026-11-25 T7.1 Opus: docs/uml/classes.md generated from javap -p of target/classes (7 diagrams, all render with mermaid-cli 11.4.2). DONE.
 - 2026-11-25 T7.2 Opus: DESIGN, API (checked against every controller route and DTO), DATA_FORMAT (checked against CsvService/CsvCodec), DECISIONS (+5 entries from reviews). DONE.
+- 2026-11-25 T7.3 Opus: README (requirements, build/run, env table, dev commands, demo data, Tailscale, doc index); doclint -Xdoclint:missing finds no undocumented type or member (enum constants were the only gap); docs/demo/{data,broken} CSV bundles verified by importing into a temp server (broken: 1 skipped + 1 orphan; good bundle afterwards adds exactly the 2 missing sets). DONE.
