@@ -15,7 +15,7 @@ import myophoria.core.port.Backups;
 /** Backups with VACUUM INTO: written to a .tmp file first and renamed only when complete. */
 public class SqliteBackups implements Backups {
     /** File-name-safe UTC timestamp, sortable as text. */
-    static final DateTimeFormatter FILE_TIME =
+    public static final DateTimeFormatter FILE_TIME =
             DateTimeFormatter.ofPattern("uuuuMMdd'T'HHmmss.SSS'Z'").withZone(ZoneOffset.UTC);
 
     private final Database db;
