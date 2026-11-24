@@ -15,4 +15,21 @@ One runnable jar (serves the UI and the API on http://127.0.0.1:7070):
     ./mvnw -q package
     java -jar target/myophoria-*.jar
 
+Settings (environment variables): `MYOPHORIA_PORT` (default 7070),
+`MYOPHORIA_DATA_DIR` (default `./data`), `MYOPHORIA_ALLOWED_HOSTS`
+(comma-separated extra host names the API accepts).
+
+## Phone access over Tailscale
+
+The server only listens on 127.0.0.1. `tailscale serve` puts it on your
+tailnet with HTTPS. Never use `tailscale funnel`: it makes the app public, and
+there is no login.
+
+    tailscale serve --bg 7070                 # https://<machine>.<tailnet>.ts.net
+    tailscale serve status                    # shows the URL
+    MYOPHORIA_ALLOWED_HOSTS=<machine>.<tailnet>.ts.net java -jar target/myophoria-*.jar
+    tailscale serve reset                     # stop serving
+
+Open the URL on a phone signed in to the same tailnet.
+
 See docs/ for the design, decisions, API and data format.

@@ -702,3 +702,4 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
 - 2026-11-25 T5.11 Opus: Phase 5 review (§8 Q4). E2E recipe: build web + jar, run jar on a temp MYOPHORIA_DATA_DIR and port 7171, start chromium --headless=new --remote-debugging-port=9333, drive with a Node script (global WebSocket, CDP Runtime.evaluate/Page.captureScreenshot, Emulation 390×844). Merged to main. DONE.
 - 2026-11-25 T6.1 Opus: full review + rubric map (§8 Q5). DONE.
 - 2026-11-25 T6.2 Opus: applied Q5 fixes; 116 tests green. DONE.
+- 2026-11-25 T6.3 Opus: README documents `tailscale serve` + MYOPHORIA_ALLOWED_HOSTS. Phone test still needs the developer; status stays TODO.
