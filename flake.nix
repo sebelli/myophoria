@@ -18,9 +18,7 @@
       nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
   in {
     devShells = forAllSystems (pkgs: let
-      # Java 25 is the current LTS. If this attribute is missing on the
-      # branch you pinned, use pkgs.jdk21 and set the Maven `release`
-      # to 21 so both machines compile for the same version.
+      # Java 25 is the current LTS.
       jdk = pkgs.jdk25;
     in {
       default = pkgs.mkShell {

@@ -1,4 +1,4 @@
-# Gym Lift Tracker
+# Myophoria
 
 A gym lift tracker: a pure Java core, a Javalin REST API, and a mobile-first
 Svelte web UI, backed by SQLite.

@@ -4,12 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-Myophoria is a gym lift tracker: a pure Java core, a Javalin REST API, and a mobile-first Svelte web UI, backed by SQLite. The repo is currently a **skeleton only** — directories with `.gitkeep`, stub docs, and the Nix dev shell. There is no `pom.xml`, Maven Wrapper, Java code, or `web/package.json` yet. Per `scaffold.sh`, Java classes are meant to come from the UML step (`docs/uml/classes.md`), and dependency versions should be verified when the pom is written — don't invent versions.
+Myophoria is a gym lift tracker: a pure Java core, a Javalin REST API, and a mobile-first Svelte web UI, backed by SQLite. The repo is currently a **skeleton only** — directories with `.gitkeep`, stub docs, and the Nix dev shell. There is no `pom.xml`, Maven Wrapper, Java code, or `web/package.json` yet. Java classes are meant to come from the UML step (`docs/uml/classes.md`), and dependency versions should be verified when the pom is written — don't invent versions.
 
 ## Environment and commands
 
 - `nix develop` (or direnv via `.envrc`: `use flake`) provides JDK 25, Maven, Node, SQLite CLI, gh, httpie, jq. `JAVA_HOME` is set by the shell. Only `x86_64-linux` is supported.
-- If `pkgs.jdk25` is unavailable on the pinned nixpkgs, switch to `jdk21` **and** set Maven `release` to 21 so all machines compile the same version.
 - System `maven` exists only to bootstrap the wrapper; day to day use `./mvnw` (e.g. `./mvnw verify`; single test: `./mvnw test -Dtest=ClassName#method`) once the wrapper is added.
 - Front end: `cd web && npm run dev` (Svelte + Vite + TypeScript + Tailwind), once initialized.
 - Format Nix with `nix fmt` (alejandra). Commit `flake.lock`.
@@ -48,3 +47,18 @@ Every model (Opus plans, Sonnet executes, Haiku explains) starts by reading `PLA
 - `.editorconfig`: UTF-8, LF, 4-space indent; 2 spaces for nix/json/yaml/ts/js/svelte/css/html/md.
 - Never commit runtime/personal data: `data/`, `backups/`, `exports/`, `*.db*` are gitignored.
 - Commit messages use Conventional Commits style (e.g. `chore: initial project skeleton`).
+
+<!-- rtk-instructions v2 -->
+# Command output
+
+Command output here is condensed to save tokens, keeping every signal and
+dropping costly noise. Treat it as the complete result: run commands
+normally, and batch related commands into one call to avoid extra turns.
+Truncated results state their recovery path in their own output. Re-run a
+command as `rtk bypass <cmd>` only when its result is unusable: empty when
+output was clearly expected, contradicting its exit code, or garbled.
+
+Delegation commands (they hand work to a cheaper model; the files never enter your context):
+- `rtk bulk-read --question "..." <paths...>`
+- `rtk code-write --spec "..." --reference <file> --target <file>`
+<!-- /rtk-instructions -->
