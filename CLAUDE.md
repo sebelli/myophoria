@@ -28,7 +28,7 @@ Dependencies point inward: `api` and `persistence` depend on `core`, never the r
 
 ## Start here: PLAN.md
 
-Every model (Opus plans, Sonnet executes, Haiku explains) starts by reading `PLAN.md` §0 (protocol and your role), §1 (task board) and the task card for your task (the next `TODO` whose dependencies are `DONE`, or the one the developer named). Read only the files that card lists; do not re-read the whole repo. Record progress, questions and contract changes in `PLAN.md` as §0 describes.
+Every model (Opus plans, Sonnet executes, Haiku explains) starts by reading `PLAN.md` §0 (protocol and your role), §1 (task board) and the task card for your task (the next `TODO` whose dependencies are `DONE`, or the one the developer named). Read only the files that card lists; do not re-read the whole repo. Before starting a task, tell the developer which model the board's Model column assigns to it, and ask them to switch (`/model opus|sonnet|haiku`) if the current model differs. Record progress, questions and contract changes in `PLAN.md` as §0 describes.
 
 ## Source of truth
 
