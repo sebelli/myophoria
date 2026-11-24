@@ -85,7 +85,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T3.2 | Bodyweight vertical | Sonnet | T2.6 | DONE |
 | T3.3 | Session + set model and repositories | Sonnet | T3.1 | DONE |
 | T3.4 | WorkoutService (live flow, prefill) + endpoints | Sonnet | T3.2, T3.3 | DONE |
-| T3.5 | HistoryService + endpoints | Sonnet | T3.4 | TODO |
+| T3.5 | HistoryService + endpoints | Sonnet | T3.4 | DONE |
 | T3.6 | ReportService (summary, progression) + endpoints | Sonnet | T3.4 | TODO |
 | T3.7 | Templates vertical | Sonnet | T3.4 | TODO |
 | T3.8 | Phase review, merge | Opus | T3.5–T3.7 | TODO |
@@ -698,3 +698,4 @@ Format: `YYYY-MM-DD T<id> <model> <status>: what changed; notes (versions picked
 - 2026-11-25 T3.3 Opus: WorkoutSet, WorkoutSession (volume, finish, effectiveEnd, duration, setTimes), Session/Set ports, SqliteSessionRepository (sets in one query, grouped by HashMap; delete relies on ON DELETE CASCADE), SqliteSetRepository. Sets load ordered by completed_at, position; position = row number within its exercise. 45 tests pass. DONE.
 - 2026-11-25 T3.1 Opus: Gym (SEEDED_DEFAULT_ID constant), GymRepository (makeDefault one tx), GymService (list/get/create/rename/makeDefault/delete/activeGym; only active names clash since gyms have no restore flow), SqliteGymRepository, GymController. GymService.CHRONOLOGICAL comparator (localDate, startedAt nulls first) is reused by later services. Test fakes: FakeGymRepository, FakeWorkoutStore (sessions()+sets() views, fresh copies on read). 53 tests pass. DONE.
 - 2026-11-25 T3.4 Opus: SetInput/Prefill/PrefillRow records, WorkoutService (start/finish/addSet/updateSet/deleteSet G6/prefill per §4.5), WorkoutController (SessionDto/SetDto with display + exerciseName, reused by history). Contract additions: ExerciseService.allById() (names of deleted exercises in history); bodyweight on a non-calisthenics set is rejected (400), not ignored; finish with zero sets → 400 (UI discards via DELETE /sessions/{id}). Prefill weights are raw conversions; the UI rounds them (T5.3). Walkthrough automated in WorkoutApiTest. 65 tests pass. DONE.
+- 2026-11-25 T3.5 Opus: HistoryFilter + SessionHeader records (SessionHeader is a contract addition for GET /sessions), HistoryService (list with loops + NEWEST_FIRST = CHRONOLOGICAL.reversed(), get, backfill closed, edit, delete), HistoryController reusing SessionDto. ErrorHandlers maps DateTimeParseException → 400. 71 tests pass. DONE.

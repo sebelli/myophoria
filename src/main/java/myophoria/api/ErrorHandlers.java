@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.javalin.config.JavalinConfig;
 import io.javalin.http.Context;
 import io.javalin.http.HttpResponseException;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 import myophoria.core.error.CorruptedCsvException;
 import myophoria.core.error.DuplicateResourceException;
@@ -29,6 +30,8 @@ public final class ErrorHandlers {
     public static void register(JavalinConfig config) {
         config.routes.exception(InvalidWorkoutInputException.class,
                 (e, ctx) -> send(ctx, 400, "INVALID_INPUT", e.getMessage(), null));
+        config.routes.exception(DateTimeParseException.class,
+                (e, ctx) -> send(ctx, 400, "INVALID_INPUT", "Dates must look like 2026-11-25", null));
         config.routes.exception(NotFoundException.class,
                 (e, ctx) -> send(ctx, 404, "NOT_FOUND", e.getMessage(), null));
         config.routes.exception(DuplicateResourceException.class, (e, ctx) -> send(ctx, 409, "DUPLICATE_RESOURCE",
