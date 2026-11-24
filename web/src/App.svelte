@@ -1,18 +1,25 @@
 <script lang="ts">
+  import type { Component } from 'svelte'
+  import ConfirmDialog from './components/ConfirmDialog.svelte'
+  import NavBar from './components/NavBar.svelte'
+  import StatusBanner from './components/StatusBanner.svelte'
+  import { route } from './lib/router.svelte'
   import Exercises from './screens/Exercises.svelte'
+  import More from './screens/More.svelte'
 
-  // hash routing without a router library (PLAN G9); more screens are added to this table
-  const routes: Record<string, typeof Exercises> = { '/exercises': Exercises }
-
-  let path = $state(location.hash.slice(1) || '/exercises')
-  $effect(() => {
-    const onHash = () => (path = location.hash.slice(1) || '/exercises')
-    window.addEventListener('hashchange', onHash)
-    return () => window.removeEventListener('hashchange', onHash)
-  })
-  const Screen = $derived(routes[path] ?? Exercises)
+  // first hash segment → screen; screens read further segments (ids) from route.parts themselves
+  const screens: Record<string, Component> = {
+    exercises: Exercises,
+    more: More,
+  }
+  const Screen = $derived(screens[route.parts[0] ?? ''] ?? Exercises)
 </script>
 
-<main class="mx-auto max-w-xl p-4">
-  <Screen />
+<StatusBanner />
+<main class="mx-auto max-w-xl px-4 pt-4 pb-24">
+  {#key route.parts.join('/')}
+    <Screen />
+  {/key}
 </main>
+<NavBar />
+<ConfirmDialog />
