@@ -75,7 +75,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T1.4 | One-jar integration check | Sonnet | T1.2, T1.3 | DONE |
 | **Phase 2** | **Exercise slice end to end**, branch `feat/exercise-slice`, tag `v0.1.0` | | | |
 | T2.1 | Core foundations + Exercise hierarchy | Sonnet | T1.4 | DONE |
-| T2.2 | Database, Migrator, `V1__init.sql`, SqliteExerciseRepository | Sonnet | T2.1 | TODO |
+| T2.2 | Database, Migrator, `V1__init.sql`, SqliteExerciseRepository | Sonnet | T2.1 | DONE |
 | T2.3 | ExerciseService (no permanent delete yet) | Sonnet | T2.2 | TODO |
 | T2.4 | API foundation + ExerciseController | Sonnet | T2.3 | TODO |
 | T2.5 | Web: API client + basic Exercises screen | Sonnet | T2.4 | TODO |
@@ -683,3 +683,4 @@ Format: `YYYY-MM-DD T<id> <model> <status>: what changed; notes (versions picked
 - 2026-11-25 T1.3 Sonnet: web/ (vite svelte-ts, tailwind 4.3.5 via @tailwindcss/vite, vite 8.3.6, svelte 5.57.3); proxy + outDir per §4.8; engines.node >=24; demo files removed; App.svelte prints /api/v1/status. check + build pass. DONE.
 - 2026-11-25 T1.4 Sonnet: Main serves classpath /public; jar serves SPA at / and /api/v1/status; README Development updated. Phase 1 DONE (merge to main pending developer: remote not pushed).
 - 2026-11-25 T2.1 Sonnet: enums, VolumeCalculable, 4 exceptions, CsvSerializable, Exercise + 5 subclasses (CSV methods throw UnsupportedOperationException until T4.2); 9 tests pass; core purity ok. Phase 1 merged to main (bc61ab2). DONE.
+- 2026-11-25 T2.2 Sonnet: V1__init.sql (copied from §5), Migrator (script list hardcoded: jars cannot list resources; statements split on ";"), Database, SqliteExerciseRepository, ExerciseRepository port. Added a minimal CsvCodec holding only TIMESTAMP (needed now for deleted_at; T4.1 adds the rest). Bug fixed on the way: an unclosed PRAGMA statement blocked the migration commit. 13 tests pass; sqlite3 schema has 7 tables, 7 indexes, seeded gym. DONE.
