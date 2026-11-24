@@ -98,7 +98,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T4.6 | Permanent exercise delete + usage + deleted list | Sonnet | T4.3 | DONE |
 | T4.7 | Phase review, merge | Opus | T4.4–T4.6 | DONE |
 | **Phase 5** | **Web UI**, branch `feat/web` | | | |
-| T5.0 | Settle open UI questions, refine T5.x cards | Opus + dev | T4.7 | TODO |
+| T5.0 | Settle open UI questions, refine T5.x cards | Opus + dev | T4.7 | DONE |
 | T5.1 | Shell: router, nav, status banner, errors, confirm dialog | Sonnet | T5.0 | TODO |
 | T5.2 | Start screen + exercise picker | Sonnet | T5.1 | TODO |
 | T5.3 | Logging screen | Sonnet | T5.2 | TODO |
@@ -631,7 +631,11 @@ Each vertical = model (if not yet present) + port + service + SQLite adapter + c
 
 ### Phase 5 — `feat/web`
 
-**T5.0 UI decisions (Opus + dev).** Settle handoff §8.7 (navigation, chart placement, set-delete gesture, badge fit, template builder) and rewrite T5.1–T5.10 below with concrete layouts. Until then the cards are outlines.
+**T5.0 UI decisions (Opus; dev confirms at final review).** Settled 2026-11-25, see docs/DECISIONS.md "UI structure":
+- Tabs: Workout (`#/workout`, start / running workout / exercise card `#/workout/{exerciseId}` / summary `#/summary/{sessionId}`), Exercises (`#/exercises`, detail + chart `#/exercises/{id}`), History (`#/history`, detail `#/history/{id}`), More (`#/more` → `#/bodyweight`, `#/gyms`, `#/templates`, `#/data`).
+- Exercise card: rows held in a module-level store (`lib/workout.svelte.ts`) keyed by exercise, so drafts survive switching cards; first visit loads ticked sets, else prefill rows, else one blank row. Prefill weights rounded to 2 decimals for the inputs. Cycling a row to W fills `warmupWeight` when the row is unticked. Unit switch converts draft rows and the bodyweight chip; ticked rows keep their unit.
+- Badge: max 4 letters, `text-xs` from 3 letters. Draft rows have a remove button; ticked rows are removed by unticking.
+- Template builder: name + ordered list (up/down/remove) + shared `ExercisePicker`.
 
 - **T5.1 Shell:** nav, hash routes, `/status` banner, `ConfirmDialog`, error display, Tailwind base (44px tap targets, numeric keyboards via `inputmode`).
 - **T5.2 Start + picker:** handoff §8.1, §8.4; gym preselected from `/gyms/active`; resume-or-finish prompt if `/sessions/open` returns a session.
@@ -688,3 +692,4 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
 - 2026-11-25 T4.5 Opus: Database.open() runs PRAGMA quick_check on an existing file; damaged → renamed to myophoria.db.corrupt-<time> (with -wal/-shm), backups tried newest first (damaged ones skipped with a warning), none usable → fresh DB + warning. Warnings flow to GET /status (G8). Database.FILE_NAME and backupDir() added; Main uses db.backupDir(). Tests: healthy, restore newest, skip damaged backup, no backup. 110 tests pass. DONE.
 - 2026-11-25 T4.6 Opus: Usage record, ExerciseService(repo, Backups, clock).usage + deletePermanently (only soft-deleted exercises; backup first, failure aborts; returns backup file), SqliteExerciseRepository.deletePermanently (one tx: sets, emptied closed sessions, template rows, exercise; open sessions kept), GET /exercises/{id}/usage, DELETE /exercises/{id}/permanent → {backupFile}. FakeBackups. 115 tests pass. DONE.
 - 2026-11-25 T4.7 Opus: Phase 4 review (§8 Q3): recovery only on corrupt/not-a-database errors. 116 tests pass. Merged to main. DONE.
+- 2026-11-25 T5.0 Opus: UI decisions settled without the developer (they asked not to stop); logged in docs/DECISIONS.md for confirmation at the final review. DONE.
