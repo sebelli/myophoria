@@ -77,7 +77,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T2.1 | Core foundations + Exercise hierarchy | Sonnet | T1.4 | DONE |
 | T2.2 | Database, Migrator, `V1__init.sql`, SqliteExerciseRepository | Sonnet | T2.1 | DONE |
 | T2.3 | ExerciseService (no permanent delete yet) | Sonnet | T2.2 | DONE |
-| T2.4 | API foundation + ExerciseController | Sonnet | T2.3 | TODO |
+| T2.4 | API foundation + ExerciseController | Sonnet | T2.3 | DONE |
 | T2.5 | Web: API client + basic Exercises screen | Sonnet | T2.4 | TODO |
 | T2.6 | Phase review, merge, tag | Opus | T2.5 | TODO |
 | **Phase 3** | **Core features**, branch `feat/core` | | | |
@@ -686,3 +686,4 @@ Format: `YYYY-MM-DD T<id> <model> <status>: what changed; notes (versions picked
 - 2026-11-25 T2.2 Sonnet: V1__init.sql (copied from §5), Migrator (script list hardcoded: jars cannot list resources; statements split on ";"), Database, SqliteExerciseRepository, ExerciseRepository port. Added a minimal CsvCodec holding only TIMESTAMP (needed now for deleted_at; T4.1 adds the rest). Bug fixed on the way: an unclosed PRAGMA statement blocked the migration commit. 13 tests pass; sqlite3 schema has 7 tables, 7 indexes, seeded gym. DONE.
 - 2026-11-25 T2.2 follow-up Opus: Migrator runs each script in one executeUpdate (sqlite-jdbc executes all statements), so the ";" split shortcut is gone; test now fails if a V*.sql file is missing from Migrator.SCRIPTS; §5 note: services truncate timestamps to millis.
 - 2026-11-25 T2.3 Sonnet: ExerciseService(repo, Clock) with search/get/create/update/softDelete/restore (usage + deletePermanently + Backups port deferred to T4.6, constructor gains Backups then); FakeExerciseRepository in test/fake; 11 service tests, 24 total pass. Note: a deleted name also blocks create/rename (409 softDeleted=true) so restore can only clash with data that bypassed the service. DONE.
+- 2026-11-25 T2.4 Sonnet: Main (env config G13, createApp wiring, Host/Origin guard), ErrorHandlers (§6.1), ExerciseController, DataController (/status). Javalin 7: routes via config.routes, JavalinJackson(new ObjectMapper(), false). Bug found by ApiTest: Jackson JsonProcessingException escaped as 500, now mapped to 400 INVALID_INPUT. 31 tests pass; httpie smoke ok (201/409/404/403). DONE.
