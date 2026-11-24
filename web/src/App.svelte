@@ -4,15 +4,37 @@
   import NavBar from './components/NavBar.svelte'
   import StatusBanner from './components/StatusBanner.svelte'
   import { route } from './lib/router.svelte'
+  import { api } from './lib/api'
+  import { choose } from './lib/dialog.svelte'
+  import { go } from './lib/router.svelte'
+  import { finishWorkout } from './lib/workout.svelte'
+  import ExerciseCard from './screens/ExerciseCard.svelte'
   import Exercises from './screens/Exercises.svelte'
   import More from './screens/More.svelte'
+  import Summary from './screens/Summary.svelte'
+  import Workout from './screens/Workout.svelte'
 
   // first hash segment → screen; screens read further segments (ids) from route.parts themselves
   const screens: Record<string, Component> = {
+    workout: Workout,
+    summary: Summary,
     exercises: Exercises,
     more: More,
   }
-  const Screen = $derived(screens[route.parts[0] ?? ''] ?? Exercises)
+  const Screen = $derived(
+    route.parts[0] === 'workout' && route.parts[1] ? ExerciseCard : (screens[route.parts[0] ?? ''] ?? Workout),
+  )
+
+  // reopening the app mid-workout offers "Resume or finish" (handoff §8.6)
+  api.openSession().then(async (open) => {
+    if (!open || route.parts[0] === 'workout' || route.parts.length === 0) return
+    const answer = await choose('A workout is still running.', [
+      { label: 'Finish it', value: 'finish' },
+      { label: 'Resume', value: 'resume' },
+    ])
+    if (answer === 'resume') go('workout')
+    if (answer === 'finish') finishWorkout()
+  }).catch(() => {})
 </script>
 
 <StatusBanner />

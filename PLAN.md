@@ -100,9 +100,9 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | **Phase 5** | **Web UI**, branch `feat/web` | | | |
 | T5.0 | Settle open UI questions, refine T5.x cards | Opus + dev | T4.7 | DONE |
 | T5.1 | Shell: router, nav, status banner, errors, confirm dialog | Sonnet | T5.0 | DONE |
-| T5.2 | Start screen + exercise picker | Sonnet | T5.1 | TODO |
-| T5.3 | Logging screen | Sonnet | T5.2 | TODO |
-| T5.4 | Finish flow + summary + save as template | Sonnet | T5.3 | TODO |
+| T5.2 | Start screen + exercise picker | Sonnet | T5.1 | DONE |
+| T5.3 | Logging screen | Sonnet | T5.2 | DONE |
+| T5.4 | Finish flow + summary + save as template | Sonnet | T5.3 | DONE |
 | T5.5 | Exercises management (full) | Sonnet | T5.1 | TODO |
 | T5.6 | History + session detail + backfill | Sonnet | T5.1 | TODO |
 | T5.7 | Bodyweight + Gyms screens | Sonnet | T5.1 | TODO |
@@ -694,3 +694,4 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
 - 2026-11-25 T4.7 Opus: Phase 4 review (§8 Q3): recovery only on corrupt/not-a-database errors. 116 tests pass. Merged to main. DONE.
 - 2026-11-25 T5.0 Opus: UI decisions settled without the developer (they asked not to stop); logged in docs/DECISIONS.md for confirmation at the final review. DONE.
 - 2026-11-25 T5.1 Opus: types.ts mirrors every DTO, api.ts covers every endpoint (FormData for import), format.ts (display rounding, dates, set labels W/1/2/F), router.svelte.ts (hash parts), dialog.svelte.ts (one app-wide choose()/confirmAction()), components ConfirmDialog (<dialog>), Badge (≤4 letters), ErrorText, StatusBanner (/status warnings), NavBar (4 tabs, 56px targets), More screen; app.css .btn/.input/.card with 44px min height and visible focus. web check + build pass. DONE.
+- 2026-11-25 T5.2–T5.4 Opus: one commit (shared store and files): lib/workout.svelte.ts (session, per-exercise cards with draft rows, template queue in localStorage, finishWorkout flow with draft and discard prompts), ExercisePicker (search, chips, inline add), Workout screen (start with gym + optional template / running list / up next / finish), ExerciseCard (W/1/2/F labels cycling, warm-up fill, kg/lb switch converting drafts, tick = POST, untick = DELETE, edit ticked = PUT, row error keeps it unticked, calisthenics bodyweight chip), Summary (kg/lb, save as template), App resume-or-finish prompt. web check + build pass; browser walkthrough in T5.11. DONE.
