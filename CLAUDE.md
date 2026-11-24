@@ -1,0 +1,50 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project status
+
+Myophoria is a gym lift tracker: a pure Java core, a Javalin REST API, and a mobile-first Svelte web UI, backed by SQLite. The repo is currently a **skeleton only** — directories with `.gitkeep`, stub docs, and the Nix dev shell. There is no `pom.xml`, Maven Wrapper, Java code, or `web/package.json` yet. Per `scaffold.sh`, Java classes are meant to come from the UML step (`docs/uml/classes.md`), and dependency versions should be verified when the pom is written — don't invent versions.
+
+## Environment and commands
+
+- `nix develop` (or direnv via `.envrc`: `use flake`) provides JDK 25, Maven, Node, SQLite CLI, gh, httpie, jq. `JAVA_HOME` is set by the shell. Only `x86_64-linux` is supported.
+- If `pkgs.jdk25` is unavailable on the pinned nixpkgs, switch to `jdk21` **and** set Maven `release` to 21 so all machines compile the same version.
+- System `maven` exists only to bootstrap the wrapper; day to day use `./mvnw` (e.g. `./mvnw verify`; single test: `./mvnw test -Dtest=ClassName#method`) once the wrapper is added.
+- Front end: `cd web && npm run dev` (Svelte + Vite + TypeScript + Tailwind), once initialized.
+- Format Nix with `nix fmt` (alejandra). Commit `flake.lock`.
+
+## Architecture (intended layout)
+
+Ports-and-adapters split under base package `myophoria`:
+
+- `myophoria.core` — pure Java domain, no framework/DB dependencies:
+  - `model` (domain types), `service` (use cases), `port` (interfaces the core needs, e.g. repositories), `csv` (CSV import/export), `error` (domain errors).
+- `myophoria.persistence` — SQLite implementations of the core ports, plus backup and corruption recovery; schema migrations in `src/main/resources/db/migration/`.
+- `myophoria.api` — Javalin REST endpoints under `/api/v1`, exception handlers, bootstrap; adapts HTTP to core services.
+- `web/` — Svelte UI. Its build output goes to `src/main/resources/public/` (gitignored), so the backend serves the built front end.
+- Tests for the core live in `src/test/java/myophoria/core`.
+
+Dependencies point inward: `api` and `persistence` depend on `core`, never the reverse.
+
+## Start here: PLAN.md
+
+Every model (Opus plans, Sonnet executes, Haiku explains) starts by reading `PLAN.md` §0 (protocol and your role), §1 (task board) and the task card for your task (the next `TODO` whose dependencies are `DONE`, or the one the developer named). Read only the files that card lists; do not re-read the whole repo. Record progress, questions and contract changes in `PLAN.md` as §0 describes.
+
+## Source of truth
+
+`PLAN.md` holds the architecture, contracts (classes, schema, API, CSV), task board and log. `handoff.md` is the source of truth for domain rules, scope and open questions, referenced from `PLAN.md` by section. Items tagged PROPOSED or OPEN there must be confirmed with the developer, and resolved questions (section 15) must not be re-asked. The project runs in **autonomous mode** (PLAN.md §0.2): models write code and work through the task board without asking the developer to approve code or designs; the developer reviews the finished program before the defense.
+
+## Docs to keep in sync
+
+- `docs/DESIGN.md` — architecture and design rules.
+- `docs/DECISIONS.md` — decision log; one entry per decision: date, decision, reason.
+- `docs/API.md` — endpoint reference (`/api/v1`).
+- `docs/DATA_FORMAT.md` — CSV export/import format.
+- `docs/uml/classes.md` — Mermaid class diagram; **must match the code**.
+
+## Conventions
+
+- `.editorconfig`: UTF-8, LF, 4-space indent; 2 spaces for nix/json/yaml/ts/js/svelte/css/html/md.
+- Never commit runtime/personal data: `data/`, `backups/`, `exports/`, `*.db*` are gitignored.
+- Commit messages use Conventional Commits style (e.g. `chore: initial project skeleton`).
