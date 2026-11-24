@@ -78,7 +78,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T2.2 | Database, Migrator, `V1__init.sql`, SqliteExerciseRepository | Sonnet | T2.1 | DONE |
 | T2.3 | ExerciseService (no permanent delete yet) | Sonnet | T2.2 | DONE |
 | T2.4 | API foundation + ExerciseController | Sonnet | T2.3 | DONE |
-| T2.5 | Web: API client + basic Exercises screen | Sonnet | T2.4 | TODO |
+| T2.5 | Web: API client + basic Exercises screen | Sonnet | T2.4 | DONE |
 | T2.6 | Phase review, merge, tag | Opus | T2.5 | TODO |
 | **Phase 3** | **Core features**, branch `feat/core` | | | |
 | T3.1 | Gyms vertical | Sonnet | T2.6 | TODO |
@@ -687,3 +687,4 @@ Format: `YYYY-MM-DD T<id> <model> <status>: what changed; notes (versions picked
 - 2026-11-25 T2.2 follow-up Opus: Migrator runs each script in one executeUpdate (sqlite-jdbc executes all statements), so the ";" split shortcut is gone; test now fails if a V*.sql file is missing from Migrator.SCRIPTS; §5 note: services truncate timestamps to millis.
 - 2026-11-25 T2.3 Sonnet: ExerciseService(repo, Clock) with search/get/create/update/softDelete/restore (usage + deletePermanently + Backups port deferred to T4.6, constructor gains Backups then); FakeExerciseRepository in test/fake; 11 service tests, 24 total pass. Note: a deleted name also blocks create/rename (409 softDeleted=true) so restore can only clash with data that bypassed the service. DONE.
 - 2026-11-25 T2.4 Sonnet: Main (env config G13, createApp wiring, Host/Origin guard), ErrorHandlers (§6.1), ExerciseController, DataController (/status). Javalin 7: routes via config.routes, JavalinJackson(new ObjectMapper(), false). Bug found by ApiTest: Jackson JsonProcessingException escaped as 500, now mapped to 400 INVALID_INPUT. 31 tests pass; httpie smoke ok (201/409/404/403). DONE.
+- 2026-11-25 T2.5 Sonnet: web lib/types.ts, lib/api.ts (ApiError), hash-routed App.svelte, screens/Exercises.svelte (search, type chips, add, soft delete). npm check + build pass; verified create/search through the Vite proxy against the real jar with curl. Not verified: rendering in a browser (no browser run). DONE.
