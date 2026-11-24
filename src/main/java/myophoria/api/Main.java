@@ -17,11 +17,13 @@ import java.util.Set;
 import myophoria.core.service.BodyweightService;
 import myophoria.core.service.ExerciseService;
 import myophoria.core.service.GymService;
+import myophoria.core.service.WorkoutService;
 import myophoria.persistence.Database;
 import myophoria.persistence.SqliteBodyweightRepository;
 import myophoria.persistence.SqliteExerciseRepository;
 import myophoria.persistence.SqliteGymRepository;
 import myophoria.persistence.SqliteSessionRepository;
+import myophoria.persistence.SqliteSetRepository;
 import org.slf4j.LoggerFactory;
 
 /** Application entry point: reads the environment, wires the layers by hand and starts the server on localhost. */
@@ -48,12 +50,17 @@ public class Main {
         Clock clock = Clock.systemUTC();
         SqliteSessionRepository sessionRepo = new SqliteSessionRepository(db);
         SqliteGymRepository gymRepo = new SqliteGymRepository(db);
-        ExerciseService exercises = new ExerciseService(new SqliteExerciseRepository(db), clock);
+        SqliteExerciseRepository exerciseRepo = new SqliteExerciseRepository(db);
+        SqliteBodyweightRepository bodyweightRepo = new SqliteBodyweightRepository(db);
+        ExerciseService exercises = new ExerciseService(exerciseRepo, clock);
+        WorkoutService workouts = new WorkoutService(sessionRepo, new SqliteSetRepository(db), exerciseRepo, gymRepo,
+                bodyweightRepo, clock);
+        WorkoutController workoutController = new WorkoutController(workouts, exercises);
         GymController gymController = new GymController(new GymService(gymRepo, sessionRepo, clock));
         ExerciseController exerciseController = new ExerciseController(exercises);
         DataController dataController = new DataController(warnings);
         BodyweightController bodyweightController =
-                new BodyweightController(new BodyweightService(new SqliteBodyweightRepository(db)));
+                new BodyweightController(new BodyweightService(bodyweightRepo));
         return Javalin.create(config -> {
             config.jsonMapper(new JavalinJackson(jsonMapper(), false));
             if (Main.class.getResource("/public") != null) { // absent on a fresh clone before the web build
@@ -72,6 +79,7 @@ public class Main {
             exerciseController.register(config.routes);
             bodyweightController.register(config.routes);
             gymController.register(config.routes);
+            workoutController.register(config.routes); // before history routes: /sessions/open vs /sessions/{id}
         });
     }
 

@@ -56,6 +56,15 @@ public class ExerciseService {
         return e;
     }
 
+    /** Returns every exercise (active and deleted) by ID, for showing names next to logged sets. */
+    public Map<String, Exercise> allById() {
+        Map<String, Exercise> result = new HashMap<>();
+        for (Exercise e : exercises.findAll()) {
+            result.put(e.getId(), e);
+        }
+        return result;
+    }
+
     /** Creates an exercise; throws if the name is invalid or already used. */
     public Exercise create(String name, EquipmentType type, Laterality laterality) {
         Exercise e = Exercise.of(type, UUID.randomUUID().toString(), name, laterality, null);
