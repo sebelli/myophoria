@@ -70,7 +70,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T0.3 | Gate C (handoff Step 2): approve class design §4, write `docs/uml/classes.md` draft | Opus + dev | T0.2 | DONE |
 | **Phase 1** | **Skeleton**, branch `chore/skeleton` | | | |
 | T1.1 | Clean scaffold leftovers | Sonnet | T0.3 | DONE |
-| T1.2 | `pom.xml`, Maven Wrapper, hello `Main` | Sonnet | T1.1 | TODO |
+| T1.2 | `pom.xml`, Maven Wrapper, hello `Main` | Sonnet | T1.1 | DONE |
 | T1.3 | Web project init (Svelte, Vite, TS, Tailwind) | Sonnet | T1.1 | TODO |
 | T1.4 | One-jar integration check | Sonnet | T1.2, T1.3 | TODO |
 | **Phase 2** | **Exercise slice end to end**, branch `feat/exercise-slice`, tag `v0.1.0` | | | |
@@ -679,3 +679,4 @@ Format: `YYYY-MM-DD T<id> <model> <status>: what changed; notes (versions picked
 - 2026-11-25 T0.2 Opus: schema approved with 3 changes: no FK cascade from exercises (explicit deletes), STRICT tables, fixed-width timestamps via CsvCodec.TIMESTAMP. DONE.
 - 2026-11-25 T0.3 Opus: class design approved; docs/uml/classes.md written (3 Mermaid diagrams + result records). Added: services generate UUIDs, time-stamping services take a Clock. Developer switched the project to autonomous mode (§0.2); T7.4 now also writes docs/DEFENSE.md. Phase 0 DONE.
 - 2026-11-25 T1.1 Sonnet: scaffold leftovers removed (src/, web/.gitkeep, scaffold.sh, JDK 21 notes, web/dist ignore); README titled Myophoria; java 25 confirmed in nix shell. DONE.
+- 2026-11-25 T1.2 Sonnet: pom + wrapper + hello Main (GET /api/v1/status). Versions (Maven Central, latest stable): javalin 7.3.0, jackson-databind/jsr310 2.23.0, sqlite-jdbc 3.54.1.0, slf4j-simple 2.0.20 (2.1.0 is alpha), junit-bom 6.1.3 (6.2.0 is milestone), surefire 3.6.1, exec 3.7.0, shade 3.6.2. Compiler/jar plugins left at Maven defaults (latest are betas). Note: Javalin 7 registers routes in config.routes; httpie needs --ignore-stdin in scripts. DONE.
