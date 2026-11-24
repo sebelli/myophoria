@@ -4,7 +4,10 @@ import java.util.Locale;
 
 /** A weight unit with its size in kilograms. */
 public enum Unit {
-    KG(1.0), LB(0.45359237);
+    /** Kilograms. */
+    KG(1.0),
+    /** Pounds (exactly 0.45359237 kg). */
+    LB(0.45359237);
 
     private final double kilograms;
 
