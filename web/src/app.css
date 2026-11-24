@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* Tailwind v4 borders default to the text colour; use a light grey like v3 did. */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-slate-200, currentColor);
+  }
+}
+
 /* Shared building blocks; 44px minimum tap targets (handoff §8.3). */
 @layer components {
   .btn {

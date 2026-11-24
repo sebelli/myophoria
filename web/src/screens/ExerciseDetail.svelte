@@ -124,7 +124,7 @@
         {#each EQUIPMENT_TYPES as t}<option value={t}>{typeLabel(t)}</option>{/each}
       </select>
       {#if (usage?.sets ?? 0) > 0}
-        <p class="text-xs text-slate-600">The type is fixed once sets are logged ({usage?.sets} sets).</p>
+        <p class="text-xs text-slate-600">The type is fixed once sets are logged ({usage?.sets} {usage?.sets === 1 ? 'set' : 'sets'}).</p>
       {/if}
       <select class="input" aria-label="Laterality" bind:value={laterality}>
         <option value="BILATERAL">Bilateral</option>

@@ -18,6 +18,7 @@
     return points.length === 1 ? (PAD.left + W - PAD.right) / 2 : PAD.left + (i * (W - PAD.left - PAD.right)) / (points.length - 1)
   }
   function y(v: number) {
+    if (max === min) return (PAD.top + H - PAD.bottom) / 2 // a flat series sits in the middle, not on the axis
     return PAD.top + (1 - (v - min) / span) * (H - PAD.top - PAD.bottom)
   }
   const line = $derived(points.map((p, i) => `${x(i)},${y(p.topWeight)}`).join(' '))
