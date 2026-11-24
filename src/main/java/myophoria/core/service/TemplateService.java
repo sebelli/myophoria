@@ -2,7 +2,9 @@ package myophoria.core.service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import myophoria.core.error.InvalidWorkoutInputException;
 import myophoria.core.error.NotFoundException;
@@ -33,12 +35,17 @@ public class TemplateService {
 
     /** Lists templates by name; soft-deleted exercises are hidden (they come back when restored, G11). */
     public List<WorkoutTemplate> list() {
+        Set<String> active = new HashSet<>(); // one load instead of one query per listed exercise
+        for (Exercise e : exercises.findAll()) {
+            if (!e.isDeleted()) {
+                active.add(e.getId());
+            }
+        }
         List<WorkoutTemplate> result = new ArrayList<>();
         for (WorkoutTemplate t : templates.findAll()) {
             List<String> visible = new ArrayList<>();
             for (String exerciseId : t.getExerciseIds()) {
-                Exercise e = exercises.findById(exerciseId);
-                if (e != null && !e.isDeleted()) {
+                if (active.contains(exerciseId)) {
                     visible.add(exerciseId);
                 }
             }

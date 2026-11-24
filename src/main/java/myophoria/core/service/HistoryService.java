@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import myophoria.core.error.InvalidWorkoutInputException;
 import myophoria.core.error.NotFoundException;
 import myophoria.core.model.Gym;
 import myophoria.core.model.WorkoutSession;
@@ -69,10 +70,13 @@ public class HistoryService {
         return s;
     }
 
-    /** Changes gym, date and times of a session; a running workout cannot get an end time here. */
+    /** Changes gym, date and times of a session; a running workout keeps its gym and gets no end time here. */
     public WorkoutSession edit(String id, String gymId, LocalDate localDate, Instant startedAt, Instant endedAt) {
         WorkoutSession s = get(id);
         if (!s.getGymId().equals(gymId)) {
+            if (s.isOpen()) {
+                throw new InvalidWorkoutInputException("The gym of a running workout is locked");
+            }
             requireActiveGym(gymId);
         }
         s.setGymId(gymId);

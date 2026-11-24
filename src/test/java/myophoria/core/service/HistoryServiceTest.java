@@ -97,5 +97,6 @@ class HistoryServiceTest {
         store.sessions().insert(new WorkoutSession("live", GYM, DAY, T0, null, true));
         assertThrows(InvalidWorkoutInputException.class, () -> service.edit("live", GYM, DAY, T0, T0.plusSeconds(60)));
         assertDoesNotThrow(() -> service.edit("live", GYM, DAY, T0.minusSeconds(60), null));
+        assertThrows(InvalidWorkoutInputException.class, () -> service.edit("live", "away", DAY, T0, null)); // gym locked
     }
 }
