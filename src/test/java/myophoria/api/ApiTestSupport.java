@@ -32,7 +32,7 @@ abstract class ApiTestSupport {
     void start() {
         Database db = new Database(dir);
         List<String> warnings = db.open();
-        app = Main.createApp(db, warnings, Set.of("lift.example.ts.net")).start("127.0.0.1", 0);
+        app = Main.createApp(db, dir.resolve("backups"), warnings, Set.of("lift.example.ts.net")).start("127.0.0.1", 0);
         base = "http://127.0.0.1:" + app.port() + "/api/v1";
     }
 

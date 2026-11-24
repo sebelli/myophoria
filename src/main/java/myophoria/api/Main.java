@@ -22,6 +22,7 @@ import myophoria.core.service.ReportService;
 import myophoria.core.service.TemplateService;
 import myophoria.core.service.WorkoutService;
 import myophoria.persistence.Database;
+import myophoria.persistence.SqliteBackups;
 import myophoria.persistence.SqliteBodyweightRepository;
 import myophoria.persistence.SqliteExerciseRepository;
 import myophoria.persistence.SqliteGymRepository;
@@ -46,11 +47,11 @@ public class Main {
         }
         Database db = new Database(dataDir);
         List<String> warnings = db.open();
-        createApp(db, warnings, allowed).start("127.0.0.1", port);
+        createApp(db, dataDir.resolve("backups"), warnings, allowed).start("127.0.0.1", port);
     }
 
     /** Wires repositories, services and controllers and returns the (not yet started) server. */
-    static Javalin createApp(Database db, List<String> warnings, Set<String> allowedHosts) {
+    static Javalin createApp(Database db, Path backupDir, List<String> warnings, Set<String> allowedHosts) {
         Clock clock = Clock.systemUTC();
         SqliteSessionRepository sessionRepo = new SqliteSessionRepository(db);
         SqliteGymRepository gymRepo = new SqliteGymRepository(db);
@@ -66,7 +67,8 @@ public class Main {
         HistoryController historyController = new HistoryController(new HistoryService(sessionRepo, gymRepo), exercises);
         GymController gymController = new GymController(new GymService(gymRepo, sessionRepo, clock));
         ExerciseController exerciseController = new ExerciseController(exercises);
-        DataController dataController = new DataController(warnings);
+        SqliteBackups backups = new SqliteBackups(db, backupDir, clock);
+        DataController dataController = new DataController(warnings, backups);
         BodyweightController bodyweightController =
                 new BodyweightController(new BodyweightService(bodyweightRepo));
         return Javalin.create(config -> {
