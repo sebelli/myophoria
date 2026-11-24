@@ -33,11 +33,17 @@ class SqliteExerciseRepositoryTest {
         db.open(); // second run must not fail or re-insert
         try (Connection c = db.connect(); Statement st = c.createStatement()) {
             try (ResultSet rs = st.executeQuery("PRAGMA user_version")) {
-                assertEquals(1, rs.getInt(1));
+                assertEquals(migrationFiles(), rs.getInt(1)); // fails if a V*.sql file is missing from Migrator.SCRIPTS
             }
             try (ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM gyms WHERE is_default = 1")) {
                 assertEquals(1, rs.getInt(1));
             }
+        }
+    }
+
+    private static int migrationFiles() throws Exception {
+        try (var files = java.nio.file.Files.list(Path.of("src/main/resources/db/migration"))) {
+            return (int) files.filter(f -> f.getFileName().toString().matches("V\\d+__.*\\.sql")).count();
         }
     }
 

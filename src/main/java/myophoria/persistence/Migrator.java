@@ -25,9 +25,7 @@ public final class Migrator {
             for (int version = current + 1; version <= SCRIPTS.size(); version++) {
                 connection.setAutoCommit(false);
                 try (Statement st = connection.createStatement()) {
-                    for (String sql : statements(read(SCRIPTS.get(version - 1)))) {
-                        st.execute(sql);
-                    }
+                    st.executeUpdate(read(SCRIPTS.get(version - 1))); // sqlite-jdbc runs every statement in the script
                     st.execute("PRAGMA user_version = " + version);
                     connection.commit();
                 } catch (SQLException | RuntimeException e) {
@@ -55,16 +53,5 @@ public final class Migrator {
         } catch (IOException e) {
             throw new IllegalStateException("Cannot read migration " + script, e);
         }
-    }
-
-    // shortcut: splits on ';' after dropping "--" comment lines, so scripts must not contain ';' inside strings or comments
-    private static List<String> statements(String script) {
-        StringBuilder sb = new StringBuilder();
-        for (String line : script.split("\n")) {
-            if (!line.trim().startsWith("--")) {
-                sb.append(line).append('\n');
-            }
-        }
-        return java.util.Arrays.stream(sb.toString().split(";")).map(String::trim).filter(s -> !s.isEmpty()).toList();
     }
 }

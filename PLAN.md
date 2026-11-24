@@ -377,7 +377,7 @@ Vite dev server proxies `/api` to `http://127.0.0.1:7070`. `build.outDir = ../sr
 
 ## 5. Schema (approved in T0.2, 2026-11-25)
 
-`src/main/resources/db/migration/V1__init.sql`. All tables are `STRICT` (SQLite rejects wrong value types). Timestamps are fixed-width ISO-8601 UTC text `2026-11-25T07:30:00.000Z`, always written with `CsvCodec.TIMESTAMP` (never `Instant.toString()`, whose length varies and breaks text sorting). Dates `YYYY-MM-DD`, booleans `0/1`, enums by name.
+`src/main/resources/db/migration/V1__init.sql`. All tables are `STRICT` (SQLite rejects wrong value types). Timestamps are fixed-width ISO-8601 UTC text `2026-11-25T07:30:00.000Z`, always written with `CsvCodec.TIMESTAMP` (never `Instant.toString()`, whose length varies and breaks text sorting). Dates `YYYY-MM-DD`, booleans `0/1`, enums by name. Stored timestamps have millisecond precision, so services truncate `clock.instant()` with `.truncatedTo(ChronoUnit.MILLIS)` before putting it on an entity (otherwise a reloaded entity no longer equals the one in memory).
 
 ```sql
 CREATE TABLE gyms (
@@ -684,3 +684,4 @@ Format: `YYYY-MM-DD T<id> <model> <status>: what changed; notes (versions picked
 - 2026-11-25 T1.4 Sonnet: Main serves classpath /public; jar serves SPA at / and /api/v1/status; README Development updated. Phase 1 DONE (merge to main pending developer: remote not pushed).
 - 2026-11-25 T2.1 Sonnet: enums, VolumeCalculable, 4 exceptions, CsvSerializable, Exercise + 5 subclasses (CSV methods throw UnsupportedOperationException until T4.2); 9 tests pass; core purity ok. Phase 1 merged to main (bc61ab2). DONE.
 - 2026-11-25 T2.2 Sonnet: V1__init.sql (copied from §5), Migrator (script list hardcoded: jars cannot list resources; statements split on ";"), Database, SqliteExerciseRepository, ExerciseRepository port. Added a minimal CsvCodec holding only TIMESTAMP (needed now for deleted_at; T4.1 adds the rest). Bug fixed on the way: an unclosed PRAGMA statement blocked the migration commit. 13 tests pass; sqlite3 schema has 7 tables, 7 indexes, seeded gym. DONE.
+- 2026-11-25 T2.2 follow-up Opus: Migrator runs each script in one executeUpdate (sqlite-jdbc executes all statements), so the ";" split shortcut is gone; test now fails if a V*.sql file is missing from Migrator.SCRIPTS; §5 note: services truncate timestamps to millis.
