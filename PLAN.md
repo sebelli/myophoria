@@ -113,7 +113,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | **Phase 6** | **Hardening + phone access**, branch `chore/hardening` | | | |
 | T6.1 | Full code-quality review → fix list in §8 | Opus | T5.11 | DONE |
 | T6.2 | Apply fix list | Sonnet | T6.1 | DONE |
-| T6.3 | Tailscale serve + phone test | Sonnet + dev | T6.2 | TODO |
+| T6.3 | Tailscale serve + phone test | Sonnet + dev | T6.2 | DONE |
 | **Phase 7** | **Docs and demo**, branch `docs/final`, tag `v1.0.0` | | | |
 | T7.1 | UML from code (`docs/uml/classes.md`) | Sonnet | T6.2 | DONE |
 | T7.2 | DESIGN, API, DATA_FORMAT, DECISIONS | Sonnet | T7.1 | DONE |
@@ -707,3 +707,4 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
 - 2026-11-25 T7.2 Opus: DESIGN, API (checked against every controller route and DTO), DATA_FORMAT (checked against CsvService/CsvCodec), DECISIONS (+5 entries from reviews). DONE.
 - 2026-11-25 T7.3 Opus: README (requirements, build/run, env table, dev commands, demo data, Tailscale, doc index); doclint -Xdoclint:missing finds no undocumented type or member (enum constants were the only gap); docs/demo/{data,broken} CSV bundles verified by importing into a temp server (broken: 1 skipped + 1 orphan; good bundle afterwards adds exactly the 2 missing sets). DONE.
 - 2026-11-25 T7.4 Opus: docs/DEMO.md (10-minute walkthrough over every rubric row; import of the broken bundle and DB corruption recovery rehearsed against the jar on a temp data dir) and docs/DEFENSE.md (per-class what/why/rubric/Q&A, tick-a-set request walkthrough with file:line refs, rubric evidence map, tests). DONE.
+- 2026-11-25 T6.3 Opus + dev: phone test over `tailscale serve` passed (add gym/exercise, start and log a workout). Pitfall found: POSTs return 403 "Host or origin not allowed" unless MYOPHORIA_ALLOWED_HOSTS is the exact host from `tailscale serve status` (no scheme); GETs pass because they carry no Origin. DONE.
