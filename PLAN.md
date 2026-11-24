@@ -90,13 +90,13 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T3.7 | Templates vertical | Sonnet | T3.4 | DONE |
 | T3.8 | Phase review, merge | Opus | T3.5–T3.7 | DONE |
 | **Phase 4** | **Files: CSV, backup, recovery**, branch `feat/files` | | | |
-| T4.1 | CsvCodec | Sonnet | T3.8 | TODO |
-| T4.2 | CsvSerializable on all entities | Sonnet | T4.1 | TODO |
-| T4.3 | SqliteBackups + backup endpoint | Sonnet | T3.8 | TODO |
-| T4.4 | CsvService ZIP export/import + endpoints | Sonnet | T4.2, T4.3 | TODO |
-| T4.5 | Startup corruption recovery + status warnings | Sonnet | T4.3 | TODO |
-| T4.6 | Permanent exercise delete + usage + deleted list | Sonnet | T4.3 | TODO |
-| T4.7 | Phase review, merge | Opus | T4.4–T4.6 | TODO |
+| T4.1 | CsvCodec | Sonnet | T3.8 | DONE |
+| T4.2 | CsvSerializable on all entities | Sonnet | T4.1 | DONE |
+| T4.3 | SqliteBackups + backup endpoint | Sonnet | T3.8 | DONE |
+| T4.4 | CsvService ZIP export/import + endpoints | Sonnet | T4.2, T4.3 | DONE |
+| T4.5 | Startup corruption recovery + status warnings | Sonnet | T4.3 | DONE |
+| T4.6 | Permanent exercise delete + usage + deleted list | Sonnet | T4.3 | DONE |
+| T4.7 | Phase review, merge | Opus | T4.4–T4.6 | DONE |
 | **Phase 5** | **Web UI**, branch `feat/web` | | | |
 | T5.0 | Settle open UI questions, refine T5.x cards | Opus + dev | T4.7 | TODO |
 | T5.1 | Shell: router, nav, status banner, errors, confirm dialog | Sonnet | T5.0 | TODO |
@@ -677,4 +677,14 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
   2. `TemplateService.list` ran one exercise query (one DB connection) per listed exercise; now one `findAll` into a `HashSet`.
   Accepted as is (personal scale, explain in Q&A): services load whole tables (`findAll`) and filter in Java per handoff §5.4; two simultaneous "start" requests can race and the loser gets a 500 from the one-open index (UI sends one); `GymService.delete`'s "last gym" check is unreachable while the default is protected, kept as a guard.
   Contract additions made during Phase 3 (all listed in §9): `SessionHeader` record, `ExerciseService.allById()`, `Gym.SEEDED_DEFAULT_ID`, `GymService.CHRONOLOGICAL`, `HistoryService.NEWEST_FIRST`, `BodyweightService.NEWEST_FIRST`, package-private `Database.format/instant`.
+- Q3 [T4.7] (Opus review) Phase 4 fix list → applied by Opus in the review commit:
+  1. Startup recovery treated every SQLite error as corruption, so a locked/unreadable file would have been renamed and replaced by a backup. Now only SQLITE_CORRUPT (11) and SQLITE_NOTADB (26) trigger recovery; anything else stops startup. Test added.
+  Accepted as is: import is row by row without one transaction (G7, backup first); a file that cannot be parsed is skipped whole; "line" in import messages is the record number; export builds the ZIP in memory (small personal data).
 - 2026-11-25 T3.8 Opus: Phase 3 review (§8 Q2): running workout's gym locked in history edit; template list loads exercises once. 82 tests pass. Merged to main. DONE.
+- 2026-11-25 T4.1 Opus: CsvCodec.formatRow (quotes only when needed, null → empty) and parse (state machine: quotes, doubled quotes, embedded comma/CR/LF, BOM, CRLF/LF/CR, blank lines skipped, column count vs header, line numbers of the record start; text after a closing quote and unterminated quotes are errors). 7 tests; 89 total pass. DONE.
+- 2026-11-25 T4.2 Opus: HEADER/toCsvRow/fromCsvRow on Exercise (via Exercise.of), Gym, WorkoutSession, WorkoutSet, BodyweightEntry, WorkoutTemplate (ids ';'-joined). CsvCodec gained field helpers (requireColumns, optional, number, optionalNumber, integer, bool, enumValue, instant, date, format, bad); they report file "" line 0 and CsvService fills in the real position. Entity rule violations (InvalidWorkoutInputException) become CorruptedCsvException. Numbers via BigDecimal.toPlainString (no exponent). 94 tests pass. DONE.
+- 2026-11-25 T4.3 Opus: Backups port, SqliteBackups (VACUUM INTO <name>.db.tmp, atomic rename, finally deleteIfExists tmp; name myophoria-<uuuuMMdd'T'HHmmss.SSS'Z'>.db, -2/-3 suffix within one millisecond), POST /backups → {file}. Main.createApp now takes the backup dir (dataDir/backups). Tests: backup opens as a database with the data; failed backup leaves no tmp. 97 tests pass. DONE.
+- 2026-11-25 T4.4 Opus: CsvService.export/importZip + FileReport/ImportReport, GET /export (zip download), POST /import (multipart 'file'). Decisions: bad/missing manifest or not-a-zip → 422 before any write; then backup; a data file that cannot be parsed or has a wrong header is skipped whole (reported), its children become orphans; row line = record number (header = 1); FileReport gained 'adjusted' for G10 flag clearing (contract addition); 64 MB unpacked cap; http.maxRequestSize 64 MB. ID sets per type start from the database and grow with imported rows (HashSet). Tests: CsvRoundTripTest (real SQLite both sides: identical re-export, re-import all present, corrupted row, missing files/orphans, bad manifest no writes, name conflict, open-session clearing, wrong header) + DataApiTest. 106 tests pass. DONE.
+- 2026-11-25 T4.5 Opus: Database.open() runs PRAGMA quick_check on an existing file; damaged → renamed to myophoria.db.corrupt-<time> (with -wal/-shm), backups tried newest first (damaged ones skipped with a warning), none usable → fresh DB + warning. Warnings flow to GET /status (G8). Database.FILE_NAME and backupDir() added; Main uses db.backupDir(). Tests: healthy, restore newest, skip damaged backup, no backup. 110 tests pass. DONE.
+- 2026-11-25 T4.6 Opus: Usage record, ExerciseService(repo, Backups, clock).usage + deletePermanently (only soft-deleted exercises; backup first, failure aborts; returns backup file), SqliteExerciseRepository.deletePermanently (one tx: sets, emptied closed sessions, template rows, exercise; open sessions kept), GET /exercises/{id}/usage, DELETE /exercises/{id}/permanent → {backupFile}. FakeBackups. 115 tests pass. DONE.
+- 2026-11-25 T4.7 Opus: Phase 4 review (§8 Q3): recovery only on corrupt/not-a-database errors. 116 tests pass. Merged to main. DONE.

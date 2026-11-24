@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import myophoria.core.csv.CsvCodec;
 import myophoria.core.csv.CsvSerializable;
 import myophoria.core.error.CorruptedCsvException;
 import myophoria.core.error.InvalidWorkoutInputException;
@@ -146,13 +147,23 @@ public class WorkoutSession implements VolumeCalculable, CsvSerializable {
         this.endedAt = endedAt;
     }
 
+    /** Column names of this entity's CSV file. */
+    public static final String[] HEADER = {"id", "gym_id", "local_date", "started_at", "ended_at", "is_open"};
+
     @Override
     public String[] toCsvRow() {
-        throw new UnsupportedOperationException("CSV support arrives in T4.2");
+        return new String[] {id, gymId, localDate.toString(), CsvCodec.format(startedAt), CsvCodec.format(endedAt), String.valueOf(open)};
     }
 
-    /** Parses one CSV row. */
+    /** Parses one CSV row in HEADER order; a bad value throws CorruptedCsvException. */
     public static WorkoutSession fromCsvRow(String[] row) throws CorruptedCsvException {
-        throw new UnsupportedOperationException("CSV support arrives in T4.2");
+        CsvCodec.requireColumns(row, HEADER.length);
+        try {
+            return new WorkoutSession(row[0], row[1], CsvCodec.date(row[2], "local_date"),
+                    CsvCodec.instant(row[3], "started_at"), CsvCodec.instant(row[4], "ended_at"),
+                    CsvCodec.bool(row[5], "is_open"));
+        } catch (InvalidWorkoutInputException e) {
+            throw CsvCodec.bad(e.getMessage());
+        }
     }
 }

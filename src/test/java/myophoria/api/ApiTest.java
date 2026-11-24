@@ -118,4 +118,25 @@ class ApiTest extends ApiTestSupport {
             return Integer.parseInt(first.substring(9, 12));
         }
     }
+
+    @Test
+    void backupEndpointWritesAFile() throws Exception {
+        JsonNode r = post("/backups", null, 200);
+        assertTrue(r.get("file").asText().matches("myophoria-\\d{8}T\\d{6}\\.\\d{3}Z\\.db"), r.toString());
+        assertTrue(java.nio.file.Files.exists(dir.resolve("backups").resolve(r.get("file").asText())));
+    }
+
+    @Test
+    void usageAndPermanentDelete() throws Exception {
+        String id = create("Old Curl");
+        JsonNode usage = get("/exercises/" + id + "/usage");
+        assertEquals(0, usage.get("sets").asInt());
+        assertEquals(0, usage.get("sessions").asInt());
+        assertEquals(400, call("DELETE", "/exercises/" + id + "/permanent", null).statusCode()); // soft delete first
+        call("DELETE", "/exercises/" + id, null);
+        HttpResponse<String> r = call("DELETE", "/exercises/" + id + "/permanent", null);
+        assertEquals(200, r.statusCode());
+        assertTrue(body(r).get("backupFile").asText().endsWith(".db"));
+        assertEquals(404, call("GET", "/exercises/" + id, null).statusCode());
+    }
 }

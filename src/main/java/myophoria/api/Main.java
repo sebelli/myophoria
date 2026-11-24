@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import myophoria.core.service.BodyweightService;
+import myophoria.core.service.CsvService;
 import myophoria.core.service.ExerciseService;
 import myophoria.core.service.GymService;
 import myophoria.core.service.HistoryService;
@@ -22,6 +23,7 @@ import myophoria.core.service.ReportService;
 import myophoria.core.service.TemplateService;
 import myophoria.core.service.WorkoutService;
 import myophoria.persistence.Database;
+import myophoria.persistence.SqliteBackups;
 import myophoria.persistence.SqliteBodyweightRepository;
 import myophoria.persistence.SqliteExerciseRepository;
 import myophoria.persistence.SqliteGymRepository;
@@ -46,31 +48,42 @@ public class Main {
         }
         Database db = new Database(dataDir);
         List<String> warnings = db.open();
-        createApp(db, warnings, allowed).start("127.0.0.1", port);
+        createApp(db, db.backupDir(), warnings, allowed).start("127.0.0.1", port);
     }
 
     /** Wires repositories, services and controllers and returns the (not yet started) server. */
-    static Javalin createApp(Database db, List<String> warnings, Set<String> allowedHosts) {
+    static Javalin createApp(Database db, Path backupDir, List<String> warnings, Set<String> allowedHosts) {
         Clock clock = Clock.systemUTC();
-        SqliteSessionRepository sessionRepo = new SqliteSessionRepository(db);
+        // adapters (persistence)
         SqliteGymRepository gymRepo = new SqliteGymRepository(db);
         SqliteExerciseRepository exerciseRepo = new SqliteExerciseRepository(db);
+        SqliteSessionRepository sessionRepo = new SqliteSessionRepository(db);
+        SqliteSetRepository setRepo = new SqliteSetRepository(db);
         SqliteBodyweightRepository bodyweightRepo = new SqliteBodyweightRepository(db);
-        ExerciseService exercises = new ExerciseService(exerciseRepo, clock);
-        WorkoutService workouts = new WorkoutService(sessionRepo, new SqliteSetRepository(db), exerciseRepo, gymRepo,
-                bodyweightRepo, clock);
-        WorkoutController workoutController = new WorkoutController(workouts, exercises);
-        TemplateController templateController = new TemplateController(
-                new TemplateService(new SqliteTemplateRepository(db), exerciseRepo, sessionRepo), exercises);
-        ReportController reportController = new ReportController(new ReportService(sessionRepo, exerciseRepo));
-        HistoryController historyController = new HistoryController(new HistoryService(sessionRepo, gymRepo), exercises);
-        GymController gymController = new GymController(new GymService(gymRepo, sessionRepo, clock));
+        SqliteTemplateRepository templateRepo = new SqliteTemplateRepository(db);
+        SqliteBackups backups = new SqliteBackups(db, backupDir, clock);
+        // use cases (core)
+        ExerciseService exercises = new ExerciseService(exerciseRepo, backups, clock);
+        GymService gyms = new GymService(gymRepo, sessionRepo, clock);
+        WorkoutService workouts = new WorkoutService(sessionRepo, setRepo, exerciseRepo, gymRepo, bodyweightRepo, clock);
+        HistoryService history = new HistoryService(sessionRepo, gymRepo);
+        ReportService reports = new ReportService(sessionRepo, exerciseRepo);
+        BodyweightService bodyweight = new BodyweightService(bodyweightRepo);
+        TemplateService templates = new TemplateService(templateRepo, exerciseRepo, sessionRepo);
+        CsvService csv = new CsvService(gymRepo, exerciseRepo, sessionRepo, setRepo, bodyweightRepo, templateRepo,
+                backups, clock);
+        // HTTP adapters
+        DataController dataController = new DataController(warnings, backups, csv);
         ExerciseController exerciseController = new ExerciseController(exercises);
-        DataController dataController = new DataController(warnings);
-        BodyweightController bodyweightController =
-                new BodyweightController(new BodyweightService(bodyweightRepo));
+        GymController gymController = new GymController(gyms);
+        WorkoutController workoutController = new WorkoutController(workouts, exercises);
+        HistoryController historyController = new HistoryController(history, exercises);
+        ReportController reportController = new ReportController(reports);
+        BodyweightController bodyweightController = new BodyweightController(bodyweight);
+        TemplateController templateController = new TemplateController(templates, exercises);
         return Javalin.create(config -> {
             config.jsonMapper(new JavalinJackson(jsonMapper(), false));
+            config.http.maxRequestSize = 64L * 1024 * 1024; // imports; CsvService caps the unpacked size too
             if (Main.class.getResource("/public") != null) { // absent on a fresh clone before the web build
                 config.staticFiles.add("/public", Location.CLASSPATH);
             } else {

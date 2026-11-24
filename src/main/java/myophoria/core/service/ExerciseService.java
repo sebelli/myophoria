@@ -1,5 +1,6 @@
 package myophoria.core.service;
 
+import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -17,19 +18,22 @@ import myophoria.core.error.NotFoundException;
 import myophoria.core.model.EquipmentType;
 import myophoria.core.model.Exercise;
 import myophoria.core.model.Laterality;
+import myophoria.core.port.Backups;
 import myophoria.core.port.ExerciseRepository;
 
-/** Use cases for the exercise library (usage and permanent delete arrive in T4.6). */
+/** Use cases for the exercise library. */
 public class ExerciseService {
     private static final String RESOURCE = "exercise";
     private static final Comparator<Exercise> BY_NAME = Comparator.comparing(Exercise::getNameKey);
 
     private final ExerciseRepository exercises;
+    private final Backups backups;
     private final Clock clock;
 
-    /** Creates the service on a repository and a clock (the clock makes deletion times testable). */
-    public ExerciseService(ExerciseRepository exercises, Clock clock) {
+    /** Creates the service on a repository, the backup port and a clock (the clock makes deletion times testable). */
+    public ExerciseService(ExerciseRepository exercises, Backups backups, Clock clock) {
         this.exercises = exercises;
+        this.backups = backups;
         this.clock = clock;
     }
 
@@ -137,5 +141,25 @@ public class ExerciseService {
             }
         }
         return active;
+    }
+
+    /** Counts the sets and sessions that a permanent delete would erase. */
+    public Usage usage(String id) {
+        get(id);
+        return new Usage(exercises.countSets(id), exercises.countSessions(id));
+    }
+
+    /**
+     * Erases a soft-deleted exercise with its sets, closed sessions left empty and template rows. A backup is taken
+     * first; if it fails nothing is deleted. Returns the backup file name.
+     */
+    public String deletePermanently(String id) throws IOException {
+        Exercise e = get(id);
+        if (!e.isDeleted()) {
+            throw new InvalidWorkoutInputException("Only a deleted exercise can be erased permanently");
+        }
+        String backup = backups.createBackup();
+        exercises.deletePermanently(id);
+        return backup;
     }
 }
