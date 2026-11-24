@@ -19,6 +19,8 @@ import myophoria.core.csv.CsvCodec;
 public class Database {
     /** Name of the database file inside the data directory. */
     public static final String FILE_NAME = "myophoria.db";
+    private static final int SQLITE_CORRUPT = 11;
+    private static final int SQLITE_NOTADB = 26;
     private final String url;
     private final Path dataDir;
 
@@ -86,12 +88,17 @@ public class Database {
                 + " and no usable backup exists, so the app started with an empty database.");
     }
 
-    private boolean isHealthy() {
+    // Only real damage counts; a locked or unreadable file must stop startup instead of being replaced.
+    private boolean isHealthy() throws IOException {
         try (Connection c = DriverManager.getConnection(url); Statement st = c.createStatement();
                 ResultSet rs = st.executeQuery("PRAGMA quick_check")) {
             return rs.next() && "ok".equals(rs.getString(1));
         } catch (SQLException e) {
-            return false; // "file is not a database" and friends
+            int primary = e.getErrorCode() & 0xff; // SQLite result code without the extended bits
+            if (primary == SQLITE_CORRUPT || primary == SQLITE_NOTADB) {
+                return false;
+            }
+            throw new IOException("Cannot check the database file: " + e.getMessage(), e);
         }
     }
 

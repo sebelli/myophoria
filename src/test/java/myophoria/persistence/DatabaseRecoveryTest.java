@@ -80,4 +80,12 @@ class DatabaseRecoveryTest {
         assertEquals(1, corruptCopies());
         assertNotNull(new SqliteGymRepository(db).findById(Gym.SEEDED_DEFAULT_ID)); // migrated from scratch
     }
+
+    @Test
+    void anUnreadableFileStopsStartupInsteadOfBeingReplaced() throws Exception {
+        Files.createDirectories(dir.resolve(Database.FILE_NAME)); // exists, but SQLite cannot open it
+        assertThrows(IllegalStateException.class, () -> new Database(dir).open());
+        assertTrue(Files.isDirectory(dir.resolve(Database.FILE_NAME)));
+        assertEquals(0, corruptCopies());
+    }
 }
