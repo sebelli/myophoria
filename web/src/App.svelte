@@ -11,7 +11,13 @@
   import ExerciseCard from './screens/ExerciseCard.svelte'
   import ExerciseDetail from './screens/ExerciseDetail.svelte'
   import Exercises from './screens/Exercises.svelte'
+  import Bodyweight from './screens/Bodyweight.svelte'
+  import Data from './screens/Data.svelte'
+  import Gyms from './screens/Gyms.svelte'
+  import History from './screens/History.svelte'
   import More from './screens/More.svelte'
+  import SessionDetail from './screens/SessionDetail.svelte'
+  import Templates from './screens/Templates.svelte'
   import Summary from './screens/Summary.svelte'
   import Workout from './screens/Workout.svelte'
 
@@ -20,14 +26,21 @@
     workout: Workout,
     summary: Summary,
     exercises: Exercises,
+    history: History,
     more: More,
+    bodyweight: Bodyweight,
+    gyms: Gyms,
+    templates: Templates,
+    data: Data,
   }
   const Screen = $derived(
     route.parts[0] === 'workout' && route.parts[1]
       ? ExerciseCard
       : route.parts[0] === 'exercises' && route.parts[1]
         ? ExerciseDetail
-        : (screens[route.parts[0] ?? ''] ?? Workout),
+        : route.parts[0] === 'history' && route.parts[1]
+          ? SessionDetail
+          : (screens[route.parts[0] ?? ''] ?? Workout),
   )
 
   // reopening the app mid-workout offers "Resume or finish" (handoff §8.6)
