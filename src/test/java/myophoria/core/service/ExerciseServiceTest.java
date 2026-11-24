@@ -10,6 +10,7 @@ import java.util.List;
 import myophoria.core.error.DuplicateResourceException;
 import myophoria.core.error.InvalidWorkoutInputException;
 import myophoria.core.error.NotFoundException;
+import myophoria.core.fake.FakeBackups;
 import myophoria.core.fake.FakeExerciseRepository;
 import myophoria.core.model.EquipmentType;
 import myophoria.core.model.Exercise;
@@ -20,12 +21,14 @@ import org.junit.jupiter.api.Test;
 class ExerciseServiceTest {
     static final Instant NOW = Instant.parse("2026-11-25T10:00:00.123456Z");
     FakeExerciseRepository repo;
+    FakeBackups backups;
     ExerciseService service;
 
     @BeforeEach
     void setUp() {
         repo = new FakeExerciseRepository();
-        service = new ExerciseService(repo, Clock.fixed(NOW, ZoneOffset.UTC));
+        backups = new FakeBackups();
+        service = new ExerciseService(repo, backups, Clock.fixed(NOW, ZoneOffset.UTC));
     }
 
     private Exercise add(String name, EquipmentType t) {
@@ -153,5 +156,34 @@ class ExerciseServiceTest {
                 .stream().map(Exercise::getName).toList();
         assertEquals(List.of("Incline Press"), dumbbells);
         assertTrue(service.search("zzz", null, false).isEmpty());
+    }
+
+    @Test
+    void usageCountsSetsAndSessions() {
+        Exercise e = add("Squat", EquipmentType.BARBELL);
+        repo.setCount(e.getId(), 4);
+        assertEquals(new Usage(4, 1), service.usage(e.getId()));
+        assertThrows(NotFoundException.class, () -> service.usage("nope"));
+    }
+
+    @Test
+    void permanentDeleteTakesABackupFirst() throws Exception {
+        Exercise e = add("Squat", EquipmentType.BARBELL);
+        assertThrows(InvalidWorkoutInputException.class, () -> service.deletePermanently(e.getId())); // still active
+        assertTrue(backups.taken.isEmpty());
+
+        service.softDelete(e.getId());
+        assertEquals("backup-1.db", service.deletePermanently(e.getId()));
+        assertNull(repo.findById(e.getId()));
+        assertThrows(NotFoundException.class, () -> service.deletePermanently(e.getId()));
+    }
+
+    @Test
+    void failedBackupAbortsTheDelete() {
+        Exercise e = add("Squat", EquipmentType.BARBELL);
+        service.softDelete(e.getId());
+        backups.fail = true;
+        assertThrows(java.io.IOException.class, () -> service.deletePermanently(e.getId()));
+        assertNotNull(repo.findById(e.getId()));
     }
 }

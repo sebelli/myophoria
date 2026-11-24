@@ -63,7 +63,7 @@ public class Main {
         SqliteTemplateRepository templateRepo = new SqliteTemplateRepository(db);
         SqliteBackups backups = new SqliteBackups(db, backupDir, clock);
         // use cases (core)
-        ExerciseService exercises = new ExerciseService(exerciseRepo, clock);
+        ExerciseService exercises = new ExerciseService(exerciseRepo, backups, clock);
         GymService gyms = new GymService(gymRepo, sessionRepo, clock);
         WorkoutService workouts = new WorkoutService(sessionRepo, setRepo, exerciseRepo, gymRepo, bodyweightRepo, clock);
         HistoryService history = new HistoryService(sessionRepo, gymRepo);

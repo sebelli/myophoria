@@ -11,7 +11,7 @@ import myophoria.core.model.Exercise;
 import myophoria.core.model.Laterality;
 import myophoria.core.service.ExerciseService;
 
-/** HTTP adapter for exercises (usage, permanent delete and progression arrive later). */
+/** HTTP adapter for exercises (progression lives in ReportController). */
 public class ExerciseController {
     /** Request body for create and update. */
     public record ExerciseRequest(String name, EquipmentType equipmentType, Laterality laterality) {
@@ -24,6 +24,10 @@ public class ExerciseController {
             return new ExerciseDto(e.getId(), e.getName(), e.type(), e.getLaterality(), e.initials(),
                     e.weightLabel(), e.isDeleted());
         }
+    }
+
+    /** Response of a permanent delete. */
+    public record PermanentDeleteResponse(String backupFile) {
     }
 
     private final ExerciseService service;
@@ -49,6 +53,9 @@ public class ExerciseController {
             service.softDelete(ctx.pathParam("id"));
             ctx.status(204);
         });
+        routes.get("/api/v1/exercises/{id}/usage", ctx -> ctx.json(service.usage(ctx.pathParam("id"))));
+        routes.delete("/api/v1/exercises/{id}/permanent",
+                ctx -> ctx.json(new PermanentDeleteResponse(service.deletePermanently(ctx.pathParam("id")))));
         routes.post("/api/v1/exercises/{id}/restore",
                 ctx -> ctx.json(ExerciseDto.of(service.restore(ctx.pathParam("id")))));
     }

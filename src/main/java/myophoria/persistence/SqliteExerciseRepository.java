@@ -93,7 +93,42 @@ public class SqliteExerciseRepository implements ExerciseRepository {
 
     @Override
     public void deletePermanently(String id) {
-        throw new UnsupportedOperationException("Permanent delete arrives in T4.6");
+        // one transaction, explicit deletes in dependency order (no FK cascade from exercises, PLAN §5)
+        try (Connection c = db.connect()) {
+            c.setAutoCommit(false);
+            try {
+                List<String> touched = new ArrayList<>();
+                try (PreparedStatement ps = c.prepareStatement(
+                        "SELECT DISTINCT session_id FROM workout_sets WHERE exercise_id = ?")) {
+                    ps.setString(1, id);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            touched.add(rs.getString(1));
+                        }
+                    }
+                }
+                execute(c, "DELETE FROM workout_sets WHERE exercise_id = ?", id);
+                for (String sessionId : touched) { // closed sessions left without sets go too (G6); open ones stay
+                    execute(c, "DELETE FROM workout_sessions WHERE id = ? AND is_open = 0 "
+                            + "AND NOT EXISTS (SELECT 1 FROM workout_sets WHERE session_id = workout_sessions.id)", sessionId);
+                }
+                execute(c, "DELETE FROM template_exercises WHERE exercise_id = ?", id);
+                execute(c, "DELETE FROM exercises WHERE id = ?", id);
+                c.commit();
+            } catch (SQLException | RuntimeException e) {
+                c.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Cannot permanently delete exercise " + id, e);
+        }
+    }
+
+    private static void execute(Connection c, String sql, String param) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, param);
+            ps.executeUpdate();
+        }
     }
 
     private int count(String sql, String exerciseId) {
