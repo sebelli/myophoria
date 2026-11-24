@@ -16,9 +16,12 @@ import java.util.List;
 import java.util.Set;
 import myophoria.core.service.BodyweightService;
 import myophoria.core.service.ExerciseService;
+import myophoria.core.service.GymService;
 import myophoria.persistence.Database;
 import myophoria.persistence.SqliteBodyweightRepository;
 import myophoria.persistence.SqliteExerciseRepository;
+import myophoria.persistence.SqliteGymRepository;
+import myophoria.persistence.SqliteSessionRepository;
 import org.slf4j.LoggerFactory;
 
 /** Application entry point: reads the environment, wires the layers by hand and starts the server on localhost. */
@@ -42,7 +45,11 @@ public class Main {
 
     /** Wires repositories, services and controllers and returns the (not yet started) server. */
     static Javalin createApp(Database db, List<String> warnings, Set<String> allowedHosts) {
-        ExerciseService exercises = new ExerciseService(new SqliteExerciseRepository(db), Clock.systemUTC());
+        Clock clock = Clock.systemUTC();
+        SqliteSessionRepository sessionRepo = new SqliteSessionRepository(db);
+        SqliteGymRepository gymRepo = new SqliteGymRepository(db);
+        ExerciseService exercises = new ExerciseService(new SqliteExerciseRepository(db), clock);
+        GymController gymController = new GymController(new GymService(gymRepo, sessionRepo, clock));
         ExerciseController exerciseController = new ExerciseController(exercises);
         DataController dataController = new DataController(warnings);
         BodyweightController bodyweightController =
@@ -64,6 +71,7 @@ public class Main {
             dataController.register(config.routes);
             exerciseController.register(config.routes);
             bodyweightController.register(config.routes);
+            gymController.register(config.routes);
         });
     }
 
