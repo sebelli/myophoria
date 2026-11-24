@@ -71,7 +71,9 @@ public class ExerciseService {
             throw new InvalidWorkoutInputException("Equipment type cannot change once the exercise has sets");
         }
         Exercise updated = Exercise.of(type, id, name, laterality, old.getDeletedAt());
-        checkNameFree(updated.getNameKey(), id);
+        if (!updated.getNameKey().equals(old.getNameKey())) { // an unchanged name never blocks editing other fields
+            checkNameFree(updated.getNameKey(), id);
+        }
         exercises.update(updated);
         return updated;
     }

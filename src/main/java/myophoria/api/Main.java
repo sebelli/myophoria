@@ -14,6 +14,7 @@ import java.util.Set;
 import myophoria.core.service.ExerciseService;
 import myophoria.persistence.Database;
 import myophoria.persistence.SqliteExerciseRepository;
+import org.slf4j.LoggerFactory;
 
 /** Application entry point: reads the environment, wires the layers by hand and starts the server on localhost. */
 public class Main {
@@ -41,7 +42,11 @@ public class Main {
         DataController dataController = new DataController(warnings);
         return Javalin.create(config -> {
             config.jsonMapper(new JavalinJackson(new ObjectMapper(), false));
-            config.staticFiles.add("/public", Location.CLASSPATH);
+            if (Main.class.getResource("/public") != null) { // absent on a fresh clone before the web build
+                config.staticFiles.add("/public", Location.CLASSPATH);
+            } else {
+                LoggerFactory.getLogger(Main.class).warn("No web build on the classpath; serving the API only");
+            }
             ErrorHandlers.register(config);
             config.routes.before("/api/*", ctx -> {
                 if (!hostAllowed(ctx.header("Host"), true, allowedHosts)
@@ -58,6 +63,9 @@ public class Main {
     static boolean hostAllowed(String header, boolean required, Set<String> allowedHosts) {
         if (header == null) {
             return !required;
+        }
+        if (header.contains("@")) {
+            return false;
         }
         String host;
         try {

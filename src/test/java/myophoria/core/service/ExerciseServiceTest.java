@@ -99,6 +99,14 @@ class ExerciseServiceTest {
     }
 
     @Test
+    void unchangedNameDoesNotClashWithDeletedTwin() {
+        Exercise active = add("Squat", EquipmentType.BARBELL);
+        repo.insert(Exercise.of(EquipmentType.BARBELL, "twin", "Squat", Laterality.BILATERAL, NOW)); // e.g. from import
+        Exercise edited = service.update(active.getId(), "Squat", EquipmentType.BARBELL, Laterality.UNILATERAL);
+        assertEquals(Laterality.UNILATERAL, edited.getLaterality());
+    }
+
+    @Test
     void updateUnknownIdIsNotFound() {
         assertThrows(NotFoundException.class,
                 () -> service.update("nope", "X", EquipmentType.STACK, Laterality.BILATERAL));

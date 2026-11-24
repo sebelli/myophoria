@@ -144,6 +144,7 @@ class ApiTest {
         assertEquals("FORBIDDEN", body(r).get("error").asText());
         assertEquals(200, call("GET", "/status", null, "Origin", "http://localhost:5173").statusCode());
         assertEquals(200, call("GET", "/status", null, "Origin", "https://lift.example.ts.net").statusCode());
+        assertEquals(403, call("GET", "/status", null, "Origin", "http://evil.com@localhost").statusCode());
     }
 
     @Test
@@ -152,6 +153,7 @@ class ApiTest {
         assertEquals(200, rawStatus("localhost:7070"));
         assertEquals(200, rawStatus("lift.example.ts.net"));
         assertEquals(403, rawStatus("localhost.evil.com"));
+        assertNotEquals(200, rawStatus("evil.com@localhost")); // Jetty already answers 400 here
     }
 
     // HttpClient forbids setting Host, so speak HTTP over a plain socket

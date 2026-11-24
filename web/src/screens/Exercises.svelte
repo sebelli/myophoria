@@ -13,9 +13,14 @@
 
   const label = (t: string) => t.replace('_', ' ').toLowerCase()
 
+  let latest = 0 // only the newest search may update the list (responses can arrive out of order)
+
   async function load() {
+    const seq = ++latest
     try {
-      exercises = await api.listExercises(query.trim(), types)
+      const result = await api.listExercises(query.trim(), types)
+      if (seq !== latest) return
+      exercises = result
       error = ''
     } catch (e) {
       error = message(e)

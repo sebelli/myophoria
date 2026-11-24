@@ -79,7 +79,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T2.3 | ExerciseService (no permanent delete yet) | Sonnet | T2.2 | DONE |
 | T2.4 | API foundation + ExerciseController | Sonnet | T2.3 | DONE |
 | T2.5 | Web: API client + basic Exercises screen | Sonnet | T2.4 | DONE |
-| T2.6 | Phase review, merge, tag | Opus | T2.5 | TODO |
+| T2.6 | Phase review, merge, tag | Opus | T2.5 | DONE |
 | **Phase 3** | **Core features**, branch `feat/core` | | | |
 | T3.1 | Gyms vertical | Sonnet | T2.6 | TODO |
 | T3.2 | Bodyweight vertical | Sonnet | T2.6 | TODO |
@@ -666,7 +666,12 @@ Each vertical = model (if not yet present) + port + service + SQLite adapter + c
 
 Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions stay until the planner compacts at phase end.
 
-_(none yet)_
+- Q1 [T2.6] (Opus review) Phase 2 fix list → all applied by Opus in the review commit:
+  1. `./mvnw verify` failed on a fresh clone (no web build): Javalin rejects a missing classpath `/public`. `Main` now adds static files only if the resource exists, else logs a warning.
+  2. Host/Origin guard accepted `evil.com@localhost` (URI treats the part before `@` as user info). Headers containing `@` are rejected; test added.
+  3. `ExerciseService.update` ran the duplicate check even when the name was unchanged, so an imported deleted twin could block editing laterality. The check now runs only when the name key changes; test added.
+  4. Exercises screen: fast typing could show stale results (out-of-order responses). A sequence counter drops old responses.
+  Reviewed and fine: core purity, entity rules (§0.4), records only in api/service, Javadoc on core, §4 names and packages, Clock + UUID in services, millisecond truncation, error format §6.1.
 
 ---
 
@@ -688,3 +693,4 @@ Format: `YYYY-MM-DD T<id> <model> <status>: what changed; notes (versions picked
 - 2026-11-25 T2.3 Sonnet: ExerciseService(repo, Clock) with search/get/create/update/softDelete/restore (usage + deletePermanently + Backups port deferred to T4.6, constructor gains Backups then); FakeExerciseRepository in test/fake; 11 service tests, 24 total pass. Note: a deleted name also blocks create/rename (409 softDeleted=true) so restore can only clash with data that bypassed the service. DONE.
 - 2026-11-25 T2.4 Sonnet: Main (env config G13, createApp wiring, Host/Origin guard), ErrorHandlers (§6.1), ExerciseController, DataController (/status). Javalin 7: routes via config.routes, JavalinJackson(new ObjectMapper(), false). Bug found by ApiTest: Jackson JsonProcessingException escaped as 500, now mapped to 400 INVALID_INPUT. 31 tests pass; httpie smoke ok (201/409/404/403). DONE.
 - 2026-11-25 T2.5 Sonnet: web lib/types.ts, lib/api.ts (ApiError), hash-routed App.svelte, screens/Exercises.svelte (search, type chips, add, soft delete). npm check + build pass; verified create/search through the Vite proxy against the real jar with curl. Not verified: rendering in a browser (no browser run). DONE.
+- 2026-11-25 T2.6 Opus: Phase 2 review; 4 fixes applied (§8 Q1); 32 tests pass with and without a web build. Merged to main, tagged v0.1.0. DONE.
