@@ -85,3 +85,23 @@ One entry per decision: date, decision, reason.
 ## 2026-11-25 — UI structure (T5.0, decided by Opus; developer to confirm at final review)
 **Decision:** Bottom tab bar with Workout, Exercises, History and More (Bodyweight, Gyms, Templates, Data). The progression chart lives on an exercise's detail page (Exercises → tap an exercise). Sets are removed by unticking; unticked draft rows have a small "remove" button (no swipe gesture). Initials badges show at most 4 letters, smaller text from 3 letters. The template builder is a name field plus an ordered list with up/down/remove buttons and the shared exercise picker (no drag and drop). History filters: from date, to date, gym, exercise.
 **Reason:** Handoff §8.1 proposed the tab bar; buttons instead of gestures need no library, work with a keyboard and are easy to explain. The developer asked for the build to continue without stopping, so the open UI items were settled with the proposed or simplest accessible option.
+
+## 2026-11-25 — Only real corruption triggers database recovery (Q1)
+**Decision:** At startup, `PRAGMA quick_check` failing or SQLite error 11 (corrupt) or 26 (not a database) moves the file aside and restores the newest backup. Any other SQL error (locked file, permissions, disk full) stops startup with the error.
+**Reason:** Treating every SQLException as corruption would move a healthy database aside because of a transient lock.
+
+## 2026-11-25 — Millisecond timestamps everywhere
+**Decision:** Services truncate every `Instant` to milliseconds before storing it; the database and CSV use the same fixed-width `CsvCodec.TIMESTAMP` format.
+**Reason:** One format means an export → import round trip keeps the exact values, and text comparison sorts correctly.
+
+## 2026-11-25 — Strict JSON numbers, lenient optional fields
+**Decision:** Jackson fails on an explicit `null` for a primitive number, but a missing optional field is fine. Malformed JSON and bad dates are 400 `INVALID_INPUT`, not 500.
+**Reason:** A typo in a request is the client's error. Requiring every optional field to be sent as an explicit null would only add noise to the UI code.
+
+## 2026-11-25 — Import size cap and Host header hardening
+**Decision:** Request bodies and the unpacked import ZIP are capped at 64 MB. A `Host` or `Origin` header containing `@` is rejected.
+**Reason:** A ZIP bomb could fill the disk. `evil.com@localhost` style headers must never pass the localhost check.
+
+## 2026-11-25 — Generated UML (T7.1)
+**Decision:** `docs/uml/classes.md` is generated from `javap -p` output of the compiled classes, with id references and the curated "uses" arrows added by hand.
+**Reason:** A diagram typed by hand drifts from the code. Generating it guarantees every field and method signature matches.
