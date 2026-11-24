@@ -10,6 +10,8 @@ src/main/resources/public/
 
 # runtime data and backups (never commit personal data)
 data/
+# the demo bundle is synthetic and referenced by README and DEMO.md
+!docs/demo/data/
 backups/
 exports/
 *.db

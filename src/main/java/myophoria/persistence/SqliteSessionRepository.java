@@ -68,6 +68,8 @@ public class SqliteSessionRepository implements SessionRepository {
         String setWhere = where.isEmpty() ? ""
                 : " WHERE session_id IN (SELECT id FROM workout_sessions" + where + ")";
         try (Connection c = db.connect()) {
+            // one read transaction: both SELECTs see the same snapshot, so a set never arrives without its session
+            c.setAutoCommit(false);
             Map<String, WorkoutSession> byId = new HashMap<>();
             List<WorkoutSession> result = new ArrayList<>();
             try (PreparedStatement ps = c.prepareStatement(SELECT + where)) {
