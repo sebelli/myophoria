@@ -7,8 +7,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import myophoria.core.csv.CsvCodec;
 
 /** Owns the SQLite file: creates and migrates it once, then hands out connections. */
 public class Database {
@@ -49,5 +51,15 @@ public class Database {
             throw e;
         }
         return c;
+    }
+
+    /** Formats an Instant as fixed-width UTC text (null stays null). */
+    static String format(Instant at) {
+        return at == null ? null : CsvCodec.TIMESTAMP.format(at);
+    }
+
+    /** Parses stored timestamp text (null stays null). */
+    static Instant instant(String text) {
+        return text == null ? null : Instant.from(CsvCodec.TIMESTAMP.parse(text));
     }
 }
