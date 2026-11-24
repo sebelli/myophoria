@@ -19,6 +19,7 @@ import myophoria.core.service.ExerciseService;
 import myophoria.core.service.GymService;
 import myophoria.core.service.HistoryService;
 import myophoria.core.service.ReportService;
+import myophoria.core.service.TemplateService;
 import myophoria.core.service.WorkoutService;
 import myophoria.persistence.Database;
 import myophoria.persistence.SqliteBodyweightRepository;
@@ -26,6 +27,7 @@ import myophoria.persistence.SqliteExerciseRepository;
 import myophoria.persistence.SqliteGymRepository;
 import myophoria.persistence.SqliteSessionRepository;
 import myophoria.persistence.SqliteSetRepository;
+import myophoria.persistence.SqliteTemplateRepository;
 import org.slf4j.LoggerFactory;
 
 /** Application entry point: reads the environment, wires the layers by hand and starts the server on localhost. */
@@ -58,6 +60,8 @@ public class Main {
         WorkoutService workouts = new WorkoutService(sessionRepo, new SqliteSetRepository(db), exerciseRepo, gymRepo,
                 bodyweightRepo, clock);
         WorkoutController workoutController = new WorkoutController(workouts, exercises);
+        TemplateController templateController = new TemplateController(
+                new TemplateService(new SqliteTemplateRepository(db), exerciseRepo, sessionRepo), exercises);
         ReportController reportController = new ReportController(new ReportService(sessionRepo, exerciseRepo));
         HistoryController historyController = new HistoryController(new HistoryService(sessionRepo, gymRepo), exercises);
         GymController gymController = new GymController(new GymService(gymRepo, sessionRepo, clock));
@@ -86,6 +90,7 @@ public class Main {
             workoutController.register(config.routes); // before history routes: /sessions/open vs /sessions/{id}
             historyController.register(config.routes);
             reportController.register(config.routes);
+            templateController.register(config.routes);
         });
     }
 
