@@ -1,5 +1,7 @@
 package myophoria.core.model;
 
+import java.util.Locale;
+
 /** A weight unit with its size in kilograms. */
 public enum Unit {
     KG(1.0), LB(0.45359237);
@@ -17,6 +19,6 @@ public enum Unit {
 
     /** Returns the lower-case label used in display text ("kg", "lb"). */
     public String label() {
-        return name().toLowerCase(java.util.Locale.ROOT);
+        return name().toLowerCase(Locale.ROOT);
     }
 }

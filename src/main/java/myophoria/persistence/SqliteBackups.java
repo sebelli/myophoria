@@ -38,16 +38,26 @@ public class SqliteBackups implements Backups {
             target = backupDir.resolve(base + "-" + n + ".db");
         }
         Path tmp = target.resolveSibling(target.getFileName() + ".tmp");
+        Connection c = null;
         try {
-            try (Connection c = db.connect(); Statement st = c.createStatement()) {
+            c = db.connect();
+            try (Statement st = c.createStatement()) {
                 st.execute("VACUUM INTO '" + tmp.toAbsolutePath().toString().replace("'", "''") + "'");
-            } catch (SQLException e) {
-                throw new IOException("Backup failed: " + e.getMessage(), e);
             }
-            Files.move(tmp, target, StandardCopyOption.ATOMIC_MOVE);
+            Files.move(tmp, target, StandardCopyOption.ATOMIC_MOVE); // the backup appears only when complete
             return target.getFileName().toString();
+        } catch (SQLException e) {
+            throw new IOException("Backup failed: " + e.getMessage(), e); // checked: the caller decides (abort delete/import)
         } finally {
-            Files.deleteIfExists(tmp); // only left over when something failed
+            // not a resource-only cleanup: also removes the half-written file after any failure
+            Files.deleteIfExists(tmp);
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (SQLException ignored) {
+                    // closing a read-only connection cannot lose data
+                }
+            }
         }
     }
 }

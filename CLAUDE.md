@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-Myophoria is a gym lift tracker: a pure Java core, a Javalin REST API, and a mobile-first Svelte web UI, backed by SQLite. The repo is currently a **skeleton only** — directories with `.gitkeep`, stub docs, and the Nix dev shell. There is no `pom.xml`, Maven Wrapper, Java code, or `web/package.json` yet. Java classes are meant to come from the UML step (`docs/uml/classes.md`), and dependency versions should be verified when the pom is written — don't invent versions.
+Myophoria is a gym lift tracker: a pure Java core, a Javalin REST API, and a mobile-first Svelte web UI, backed by SQLite. Phases 0–5 of `PLAN.md` are built (backend, all API endpoints, all screens); see the board in `PLAN.md` §1 for what remains. Dependency versions are logged in `PLAN.md` §9 — don't invent versions.
 
 ## Environment and commands
 
 - `nix develop` (or direnv via `.envrc`: `use flake`) provides JDK 25, Maven, Node, SQLite CLI, gh, httpie, jq. `JAVA_HOME` is set by the shell. Only `x86_64-linux` is supported.
-- System `maven` exists only to bootstrap the wrapper; day to day use `./mvnw` (e.g. `./mvnw verify`; single test: `./mvnw test -Dtest=ClassName#method`) once the wrapper is added.
-- Front end: `cd web && npm run dev` (Svelte + Vite + TypeScript + Tailwind), once initialized.
+- Use `./mvnw` (e.g. `./mvnw verify`; single test: `./mvnw test -Dtest=ClassName#method`); system `maven` only bootstrapped the wrapper.
+- Front end: `cd web && npm run dev` (Svelte + Vite + TypeScript + Tailwind; proxies `/api` to :7070). `npm run build` writes into `src/main/resources/public/`.
 - Format Nix with `nix fmt` (alejandra). Commit `flake.lock`.
 
 ## Architecture (intended layout)

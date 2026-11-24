@@ -2,6 +2,7 @@ package myophoria.api;
 
 import io.javalin.config.RoutesConfig;
 import io.javalin.http.Context;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -61,7 +62,7 @@ public class ExerciseController {
     }
 
     private void list(Context ctx) {
-        List<ExerciseDto> result = new java.util.ArrayList<>();
+        List<ExerciseDto> result = new ArrayList<>();
         for (Exercise e : service.search(ctx.queryParam("q"), parseTypes(ctx.queryParam("type")),
                 parseBoolean(ctx.queryParam("deleted")))) {
             result.add(ExerciseDto.of(e));

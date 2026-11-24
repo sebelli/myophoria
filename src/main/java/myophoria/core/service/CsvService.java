@@ -1,5 +1,6 @@
 package myophoria.core.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import myophoria.core.csv.CsvCodec;
@@ -347,7 +349,7 @@ public class CsvService {
                 return rows;
             }
             List<String[]> parsed;
-            try (Reader r = new InputStreamReader(new java.io.ByteArrayInputStream(bytes), StandardCharsets.UTF_8)) {
+            try (Reader r = new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8)) {
                 parsed = CsvCodec.parse(r, file);
             } catch (CorruptedCsvException e) {
                 skipped.add(e.getMessage() + " (whole file skipped)");
@@ -434,7 +436,7 @@ public class CsvService {
                 String name = e.getName().substring(e.getName().lastIndexOf('/') + 1); // tolerate a top folder
                 files.put(name, bytes.toByteArray());
             }
-        } catch (java.util.zip.ZipException ex) {
+        } catch (ZipException ex) {
             throw new CorruptedCsvException("import", 0, "not a valid ZIP file");
         }
         return files;
@@ -445,7 +447,7 @@ public class CsvService {
             throw new CorruptedCsvException("manifest.csv", 0, "missing: not a Myophoria export");
         }
         List<String[]> rows = CsvCodec.parse(
-                new InputStreamReader(new java.io.ByteArrayInputStream(manifest), StandardCharsets.UTF_8), "manifest.csv");
+                new InputStreamReader(new ByteArrayInputStream(manifest), StandardCharsets.UTF_8), "manifest.csv");
         if (rows.size() != 2 || !Arrays.equals(rows.get(0), MANIFEST_HEADER)) {
             throw new CorruptedCsvException("manifest.csv", 1, "expected header format_version,exported_at and one row");
         }
