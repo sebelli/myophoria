@@ -2,6 +2,7 @@ package myophoria.core.model;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import myophoria.core.csv.CsvCodec;
 import myophoria.core.csv.CsvSerializable;
 import myophoria.core.error.CorruptedCsvException;
 import myophoria.core.error.InvalidWorkoutInputException;
@@ -83,13 +84,23 @@ public class BodyweightEntry implements CsvSerializable {
         this.localDate = localDate;
     }
 
+    /** Column names of this entity's CSV file. */
+    public static final String[] HEADER = {"id", "weight", "unit", "recorded_at", "local_date"};
+
     @Override
     public String[] toCsvRow() {
-        throw new UnsupportedOperationException("CSV support arrives in T4.2");
+        return new String[] {id, CsvCodec.format(weight), unit.name(), CsvCodec.format(recordedAt), localDate.toString()};
     }
 
-    /** Parses one CSV row. */
+    /** Parses one CSV row in HEADER order; a bad value throws CorruptedCsvException. */
     public static BodyweightEntry fromCsvRow(String[] row) throws CorruptedCsvException {
-        throw new UnsupportedOperationException("CSV support arrives in T4.2");
+        CsvCodec.requireColumns(row, HEADER.length);
+        try {
+            return new BodyweightEntry(row[0], CsvCodec.number(row[1], "weight"),
+                    CsvCodec.enumValue(Unit.class, row[2], "unit"), CsvCodec.instant(row[3], "recorded_at"),
+                    CsvCodec.date(row[4], "local_date"));
+        } catch (InvalidWorkoutInputException e) {
+            throw CsvCodec.bad(e.getMessage());
+        }
     }
 }

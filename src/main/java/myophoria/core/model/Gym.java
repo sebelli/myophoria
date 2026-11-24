@@ -2,6 +2,7 @@ package myophoria.core.model;
 
 import java.text.Normalizer;
 import java.time.Instant;
+import myophoria.core.csv.CsvCodec;
 import myophoria.core.csv.CsvSerializable;
 import myophoria.core.error.CorruptedCsvException;
 import myophoria.core.error.InvalidWorkoutInputException;
@@ -80,13 +81,21 @@ public class Gym implements CsvSerializable {
         this.deletedAt = at;
     }
 
+    /** Column names of this entity's CSV file. */
+    public static final String[] HEADER = {"id", "name", "is_default", "deleted_at"};
+
     @Override
     public String[] toCsvRow() {
-        throw new UnsupportedOperationException("CSV support arrives in T4.2");
+        return new String[] {id, name, String.valueOf(isDefault), CsvCodec.format(deletedAt)};
     }
 
-    /** Parses one CSV row. */
+    /** Parses one CSV row in HEADER order; a bad value throws CorruptedCsvException. */
     public static Gym fromCsvRow(String[] row) throws CorruptedCsvException {
-        throw new UnsupportedOperationException("CSV support arrives in T4.2");
+        CsvCodec.requireColumns(row, HEADER.length);
+        try {
+            return new Gym(row[0], row[1], CsvCodec.bool(row[2], "is_default"), CsvCodec.instant(row[3], "deleted_at"));
+        } catch (InvalidWorkoutInputException e) {
+            throw CsvCodec.bad(e.getMessage());
+        }
     }
 }

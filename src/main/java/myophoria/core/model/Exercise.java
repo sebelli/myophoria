@@ -3,6 +3,7 @@ package myophoria.core.model;
 import java.text.Normalizer;
 import java.time.Instant;
 import java.util.Locale;
+import myophoria.core.csv.CsvCodec;
 import myophoria.core.csv.CsvSerializable;
 import myophoria.core.error.CorruptedCsvException;
 import myophoria.core.error.InvalidWorkoutInputException;
@@ -155,13 +156,22 @@ public abstract class Exercise implements CsvSerializable {
         return deletedAt != null;
     }
 
+    /** Column names of this entity's CSV file. */
+    public static final String[] HEADER = {"id", "name", "equipment_type", "laterality", "deleted_at"};
+
     @Override
     public String[] toCsvRow() {
-        throw new UnsupportedOperationException("CSV support arrives in T4.2");
+        return new String[] {id, name, type().name(), laterality.name(), CsvCodec.format(deletedAt)};
     }
 
-    /** Parses one CSV row into the right subclass. */
+    /** Parses one CSV row in HEADER order; a bad value throws CorruptedCsvException. */
     public static Exercise fromCsvRow(String[] row) throws CorruptedCsvException {
-        throw new UnsupportedOperationException("CSV support arrives in T4.2");
+        CsvCodec.requireColumns(row, HEADER.length);
+        try {
+            return Exercise.of(CsvCodec.enumValue(EquipmentType.class, row[2], "equipment_type"), row[0], row[1],
+                    CsvCodec.enumValue(Laterality.class, row[3], "laterality"), CsvCodec.instant(row[4], "deleted_at"));
+        } catch (InvalidWorkoutInputException e) {
+            throw CsvCodec.bad(e.getMessage());
+        }
     }
 }

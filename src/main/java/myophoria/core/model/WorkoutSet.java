@@ -1,6 +1,7 @@
 package myophoria.core.model;
 
 import java.time.Instant;
+import myophoria.core.csv.CsvCodec;
 import myophoria.core.csv.CsvSerializable;
 import myophoria.core.error.CorruptedCsvException;
 import myophoria.core.error.InvalidWorkoutInputException;
@@ -162,13 +163,26 @@ public class WorkoutSet implements VolumeCalculable, CsvSerializable {
         return value;
     }
 
+    /** Column names of this entity's CSV file. */
+    public static final String[] HEADER = {"id", "session_id", "exercise_id", "position", "set_type", "weight", "unit", "reps", "bodyweight", "completed_at"};
+
     @Override
     public String[] toCsvRow() {
-        throw new UnsupportedOperationException("CSV support arrives in T4.2");
+        return new String[] {id, sessionId, exerciseId, String.valueOf(position), setType.name(), CsvCodec.format(weight),
+                unit.name(), String.valueOf(reps), bodyweight == null ? "" : CsvCodec.format(bodyweight),
+                CsvCodec.format(completedAt)};
     }
 
-    /** Parses one CSV row. */
+    /** Parses one CSV row in HEADER order; a bad value throws CorruptedCsvException. */
     public static WorkoutSet fromCsvRow(String[] row) throws CorruptedCsvException {
-        throw new UnsupportedOperationException("CSV support arrives in T4.2");
+        CsvCodec.requireColumns(row, HEADER.length);
+        try {
+            return new WorkoutSet(row[0], row[1], row[2], CsvCodec.integer(row[3], "position"),
+                    CsvCodec.enumValue(SetType.class, row[4], "set_type"), CsvCodec.number(row[5], "weight"),
+                    CsvCodec.enumValue(Unit.class, row[6], "unit"), CsvCodec.integer(row[7], "reps"),
+                    CsvCodec.optionalNumber(row[8], "bodyweight"), CsvCodec.instant(row[9], "completed_at"));
+        } catch (InvalidWorkoutInputException e) {
+            throw CsvCodec.bad(e.getMessage());
+        }
     }
 }

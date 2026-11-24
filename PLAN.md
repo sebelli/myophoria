@@ -91,7 +91,7 @@ API smoke tests use httpie against `./mvnw -q exec:java` or the built jar, e.g. 
 | T3.8 | Phase review, merge | Opus | T3.5–T3.7 | DONE |
 | **Phase 4** | **Files: CSV, backup, recovery**, branch `feat/files` | | | |
 | T4.1 | CsvCodec | Sonnet | T3.8 | DONE |
-| T4.2 | CsvSerializable on all entities | Sonnet | T4.1 | TODO |
+| T4.2 | CsvSerializable on all entities | Sonnet | T4.1 | DONE |
 | T4.3 | SqliteBackups + backup endpoint | Sonnet | T3.8 | TODO |
 | T4.4 | CsvService ZIP export/import + endpoints | Sonnet | T4.2, T4.3 | TODO |
 | T4.5 | Startup corruption recovery + status warnings | Sonnet | T4.3 | TODO |
@@ -679,3 +679,4 @@ Format: `Q<n> [task] (asker) question → answer (planner)`. Answered questions 
   Contract additions made during Phase 3 (all listed in §9): `SessionHeader` record, `ExerciseService.allById()`, `Gym.SEEDED_DEFAULT_ID`, `GymService.CHRONOLOGICAL`, `HistoryService.NEWEST_FIRST`, `BodyweightService.NEWEST_FIRST`, package-private `Database.format/instant`.
 - 2026-11-25 T3.8 Opus: Phase 3 review (§8 Q2): running workout's gym locked in history edit; template list loads exercises once. 82 tests pass. Merged to main. DONE.
 - 2026-11-25 T4.1 Opus: CsvCodec.formatRow (quotes only when needed, null → empty) and parse (state machine: quotes, doubled quotes, embedded comma/CR/LF, BOM, CRLF/LF/CR, blank lines skipped, column count vs header, line numbers of the record start; text after a closing quote and unterminated quotes are errors). 7 tests; 89 total pass. DONE.
+- 2026-11-25 T4.2 Opus: HEADER/toCsvRow/fromCsvRow on Exercise (via Exercise.of), Gym, WorkoutSession, WorkoutSet, BodyweightEntry, WorkoutTemplate (ids ';'-joined). CsvCodec gained field helpers (requireColumns, optional, number, optionalNumber, integer, bool, enumValue, instant, date, format, bad); they report file "" line 0 and CsvService fills in the real position. Entity rule violations (InvalidWorkoutInputException) become CorruptedCsvException. Numbers via BigDecimal.toPlainString (no exponent). 94 tests pass. DONE.

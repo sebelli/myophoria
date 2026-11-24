@@ -2,6 +2,10 @@ package myophoria.core.csv;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -125,5 +129,100 @@ public final class CsvCodec {
                     "expected " + rows.get(0).length + " columns, found " + row.length);
         }
         rows.add(row);
+    }
+
+    // ---- field helpers for the entities' fromCsvRow/toCsvRow. They report file "" and line 0;
+    // ---- CsvService rethrows with the real file name and line number.
+
+    /** Throws unless the row has exactly n columns. */
+    public static void requireColumns(String[] row, int n) throws CorruptedCsvException {
+        if (row == null || row.length != n) {
+            throw bad("expected " + n + " columns");
+        }
+    }
+
+    /** Returns the text, or null for an empty field. */
+    public static String optional(String value) {
+        return value == null || value.isEmpty() ? null : value;
+    }
+
+    /** Parses a decimal number with a '.' point. */
+    public static double number(String value, String column) throws CorruptedCsvException {
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException | NullPointerException e) {
+            throw bad(column + " is not a number: " + value);
+        }
+    }
+
+    /** Parses a decimal number, or null for an empty field. */
+    public static Double optionalNumber(String value, String column) throws CorruptedCsvException {
+        return optional(value) == null ? null : number(value, column);
+    }
+
+    /** Parses a whole number. */
+    public static int integer(String value, String column) throws CorruptedCsvException {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw bad(column + " is not a whole number: " + value);
+        }
+    }
+
+    /** Parses "true" or "false" (nothing else). */
+    public static boolean bool(String value, String column) throws CorruptedCsvException {
+        if ("true".equals(value)) {
+            return true;
+        }
+        if ("false".equals(value)) {
+            return false;
+        }
+        throw bad(column + " must be true or false: " + value);
+    }
+
+    /** Parses an enum constant by its exact name. */
+    public static <E extends Enum<E>> E enumValue(Class<E> type, String value, String column)
+            throws CorruptedCsvException {
+        try {
+            return Enum.valueOf(type, value);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw bad(column + " has an unknown value: " + value);
+        }
+    }
+
+    /** Parses a TIMESTAMP field, or null for an empty field. */
+    public static Instant instant(String value, String column) throws CorruptedCsvException {
+        if (optional(value) == null) {
+            return null;
+        }
+        try {
+            return Instant.from(TIMESTAMP.parse(value));
+        } catch (DateTimeParseException e) {
+            throw bad(column + " is not a timestamp like 2026-11-25T07:30:00.000Z: " + value);
+        }
+    }
+
+    /** Parses a YYYY-MM-DD date. */
+    public static LocalDate date(String value, String column) throws CorruptedCsvException {
+        try {
+            return LocalDate.parse(value);
+        } catch (DateTimeParseException | NullPointerException e) {
+            throw bad(column + " is not a date like 2026-11-25: " + value);
+        }
+    }
+
+    /** Writes a number without exponent notation. */
+    public static String format(double value) {
+        return BigDecimal.valueOf(value).toPlainString();
+    }
+
+    /** Writes a timestamp, or an empty field for null. */
+    public static String format(Instant value) {
+        return value == null ? "" : TIMESTAMP.format(value);
+    }
+
+    /** Builds the exception for a bad field (file and line are filled in by CsvService). */
+    public static CorruptedCsvException bad(String reason) {
+        return new CorruptedCsvException("", 0, reason);
     }
 }
