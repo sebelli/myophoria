@@ -99,6 +99,7 @@
   async function discard() {
     try {
       await discardWorkout()
+      if (!workout.session) await init() // discarded in place: load the gyms and templates for a new start
     } catch (e) {
       error = errorMessage(e)
     }
@@ -107,6 +108,7 @@
   async function finish() {
     try {
       await finishWorkout()
+      if (!workout.session) await init() // discarded in place: load the gyms and templates for a new start
     } catch (e) {
       error = errorMessage(e)
     }

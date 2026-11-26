@@ -115,6 +115,9 @@
   .input:focus {
     @apply border-ink;
   }
+  .input::file-selector-button {
+    @apply mr-3 min-h-10 border-0 border-r border-edge bg-transparent pr-3 font-display text-[13px] tracking-[0.08em] text-ink uppercase;
+  }
   .card {
     @apply border-y border-line;
   }
