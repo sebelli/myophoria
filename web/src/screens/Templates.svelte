@@ -86,7 +86,7 @@
   <form class="card mb-4 space-y-3 p-3" onsubmit={save}>
     <h2 class="font-medium">{editingId ? 'Edit template' : 'New template'}</h2>
     <input class="input" placeholder="Name" aria-label="Template name" bind:value={name} required />
-    <ol class="divide-y rounded border">
+    <ol class="divide-y border">
       {#each chosen as ex, i (ex.id)}
         <li class="flex items-center gap-2 p-2">
           <Badge initials={ex.initials} />
