@@ -152,7 +152,7 @@
   <ErrorText message={error} />
 
   {#if exerciseOrder().length}
-    <ul class="mb-4 divide-y border-y">
+    <ul class="mb-4 divide-y border-b">
       {#each exerciseOrder() as id (id)}
         {@const open = workout.open === id}
         {@const card = workout.cards[id]}

@@ -165,7 +165,7 @@
             <option value="KG">KG</option>
             <option value="LB">LB</option>
           </select>
-          <span class="block text-[11px] tracking-normal text-faint normal-case">{card.exercise.weightLabel}</span>
+          <span class="text-dim">{card.exercise.weightLabel}</span>
         </th>
         <th class="py-1 font-normal">Reps</th>
         <th class="w-12 py-1 font-normal">Done</th>

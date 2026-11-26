@@ -11,8 +11,8 @@
 
   async function end() {
     const answer = await choose('End this workout?', [
-      { label: 'Discard workout', value: 'discard', danger: true },
       { label: 'Finish & save', value: 'finish' },
+      { label: 'Discard workout', value: 'discard', danger: true },
     ])
     try {
       if (answer === 'finish') await finishWorkout()

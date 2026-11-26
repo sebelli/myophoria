@@ -77,6 +77,9 @@
     caret-color: var(--color-live);
     -webkit-tap-highlight-color: transparent;
   }
+  summary::-webkit-details-marker {
+    display: none;
+  }
   ::selection {
     background: var(--color-live);
     color: var(--color-ground);
@@ -89,6 +92,7 @@
     letter-spacing: 0.04em;
   }
   summary {
+    list-style: none;
     font-family: var(--font-display);
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -114,6 +118,9 @@
   }
   .input:focus {
     @apply border-ink;
+  }
+  .input:disabled {
+    @apply border-line text-dim;
   }
   .input::file-selector-button {
     @apply mr-3 min-h-10 border-0 border-r border-edge bg-transparent pr-3 font-display text-[13px] tracking-[0.08em] text-ink uppercase;

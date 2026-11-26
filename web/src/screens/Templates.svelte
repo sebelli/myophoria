@@ -7,6 +7,7 @@
   import { confirmAction } from '../lib/dialog.svelte'
   import { go } from '../lib/router.svelte'
   import type { Exercise, Template } from '../lib/types'
+  import { workout } from '../lib/workout.svelte'
 
   let templates = $state<Template[]>([])
   let error = $state('')
@@ -90,8 +91,8 @@
         <li class="flex items-center gap-2 p-2">
           <Badge initials={ex.initials} />
           <span class="flex-1">{ex.name}</span>
-          <button type="button" class="btn px-3" aria-label="Move {ex.name} up" disabled={i === 0} onclick={() => move(i, -1)}>↑</button>
-          <button type="button" class="btn px-3" aria-label="Move {ex.name} down" disabled={i === chosen.length - 1} onclick={() => move(i, 1)}>↓</button>
+          <button type="button" class="btn px-3" aria-label="Move {ex.name} up" disabled={i === 0} onclick={() => move(i, -1)}><span class="rotate-180"><Icon name="chevron" /></span></button>
+          <button type="button" class="btn px-3" aria-label="Move {ex.name} down" disabled={i === chosen.length - 1} onclick={() => move(i, 1)}><Icon name="chevron" /></button>
           <button type="button" class="btn px-3 text-dim" aria-label="Remove {ex.name}" onclick={() => (chosen = chosen.filter((x) => x.id !== ex.id))}><Icon name="close" /></button>
         </li>
       {:else}
@@ -119,7 +120,7 @@
       </div>
       <p class="mb-3 text-sm text-dim">{t.exercises.map((e) => e.name).join(' · ') || 'All its exercises are deleted.'}</p>
       <div class="flex gap-2">
-        <button type="button" class="btn btn-primary flex-1" onclick={() => start(t)}>Start</button>
+        {#if !workout.session}<button type="button" class="btn btn-primary flex-1" onclick={() => start(t)}>Start</button>{/if}
         <button type="button" class="btn" onclick={() => open(t)}>Edit</button>
         <button type="button" class="btn text-dim" aria-label="Delete {t.name}" onclick={() => remove(t)}><Icon name="close" /></button>
       </div>

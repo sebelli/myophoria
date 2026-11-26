@@ -74,8 +74,10 @@
   </form>
 {/if}
 
-<details class="card mb-4 p-3">
-  <summary class="min-h-11 cursor-pointer content-center font-medium">Filters{from || to || gymId || exerciseId ? ' (active)' : ''}</summary>
+<details class="group card mb-4 p-3">
+  <summary class="flex min-h-11 cursor-pointer items-center justify-between font-medium"
+    >Filters{from || to || gymId || exerciseId ? ' (active)' : ''}<span class="text-dim group-open:rotate-180"><Icon name="chevron" /></span></summary
+  >
   <div class="mt-2 grid grid-cols-2 gap-2">
     <label><span class="label">From</span><input class="input" type="date" bind:value={from} /></label>
     <label><span class="label">To</span><input class="input" type="date" bind:value={to} /></label>
@@ -103,7 +105,7 @@
       <a href={'#/history/' + s.id} class="block min-h-14 p-3">
         <span class="flex justify-between">
           <span class="font-medium">{longDate(s.localDate)}</span>
-          {#if s.open}<span class="border border-live px-2 font-display text-xs tracking-[0.1em] text-live uppercase">running</span>{/if}
+          {#if s.open}<span class="font-display text-xs tracking-[0.1em] text-live uppercase">running</span>{/if}
         </span>
         <span class="block text-sm text-dim">
           {s.gymName ?? 'Unknown gym'} · {s.setCount} sets{s.startedAt ? ' · ' + time(s.startedAt) : ''}{s.endedAt ? '–' + time(s.endedAt) : ''}
