@@ -8,7 +8,6 @@
   import { choose } from './lib/dialog.svelte'
   import { go } from './lib/router.svelte'
   import { finishWorkout } from './lib/workout.svelte'
-  import ExerciseCard from './screens/ExerciseCard.svelte'
   import ExerciseDetail from './screens/ExerciseDetail.svelte'
   import Exercises from './screens/Exercises.svelte'
   import Bodyweight from './screens/Bodyweight.svelte'
@@ -34,13 +33,11 @@
     data: Data,
   }
   const Screen = $derived(
-    route.parts[0] === 'workout' && route.parts[1]
-      ? ExerciseCard
-      : route.parts[0] === 'exercises' && route.parts[1]
-        ? ExerciseDetail
-        : route.parts[0] === 'history' && route.parts[1]
-          ? SessionDetail
-          : (screens[route.parts[0] ?? ''] ?? Workout),
+    route.parts[0] === 'exercises' && route.parts[1]
+      ? ExerciseDetail
+      : route.parts[0] === 'history' && route.parts[1]
+        ? SessionDetail
+        : (screens[route.parts[0] ?? ''] ?? Workout), // an old #/workout/<id> link lands on Workout
   )
 
   // reopening the app mid-workout offers "Resume or finish" (handoff §8.6)

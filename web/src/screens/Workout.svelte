@@ -1,14 +1,13 @@
 <script lang="ts">
   import Icon from '../components/Icon.svelte'
-  import Badge from '../components/Badge.svelte'
   import Clock from '../components/Clock.svelte'
   import ErrorText from '../components/ErrorText.svelte'
+  import ExerciseCard from '../components/ExerciseCard.svelte'
   import ExercisePicker from '../components/ExercisePicker.svelte'
   import { api, errorMessage } from '../lib/api'
   import { longDate, time, today } from '../lib/format'
-  import { go } from '../lib/router.svelte'
   import type { Exercise, Gym, Template } from '../lib/types'
-  import { exerciseOrder, finishWorkout, loadOpen, startWorkout, workout } from '../lib/workout.svelte'
+  import { exerciseOrder, finishWorkout, loadOpen, openCard, startWorkout, workout } from '../lib/workout.svelte'
 
   let loading = $state(true)
   let error = $state('')
@@ -69,6 +68,27 @@
     }
   }
 
+  // one exercise open at a time; opening builds its card (prefill) first
+  async function openExercise(id: string) {
+    try {
+      await openCard(id)
+      await loadNames()
+      workout.open = id
+      picking = false
+    } catch (e) {
+      error = errorMessage(e)
+    }
+  }
+
+  function toggle(id: string) {
+    if (workout.open === id) workout.open = null
+    else openExercise(id)
+  }
+
+  function ticked(id: string) {
+    return workout.cards[id]?.rows.filter((r) => r.setId).length ?? 0
+  }
+
   function setCount(exerciseId: string) {
     return workout.session?.sets.filter((s) => s.exerciseId === exerciseId).length ?? 0
   }
@@ -119,28 +139,36 @@
   <ErrorText message={error} />
 
   {#if exerciseOrder().length}
-    <ul class="card mb-4 divide-y">
+    <ul class="mb-4 divide-y border-y">
       {#each exerciseOrder() as id (id)}
+        {@const open = workout.open === id}
+        {@const card = workout.cards[id]}
         <li>
-          <a href={'#/workout/' + id} class="flex min-h-14 items-center gap-3 p-2">
-            {#if names[id]}<Badge initials={names[id].initials} />{/if}
-            <span class="flex-1 font-medium">{names[id]?.name ?? '…'}</span>
-            <span class="text-sm text-dim">{setCount(id)} sets</span>
-          </a>
+          <button type="button" class="flex min-h-14 w-full items-center gap-3 text-left" aria-expanded={open} onclick={() => toggle(id)}>
+            <span class="flex-1 font-display text-xl tracking-[0.04em] uppercase {open ? 'text-ink' : 'text-dim'}">{names[id]?.name ?? '…'}</span>
+            {#if open && card}
+              <span class="font-display text-base text-live" aria-label="{ticked(id)} of {card.rows.length} sets done">{ticked(id)}/{card.rows.length}</span>
+            {:else}
+              <span class="text-sm text-dim">{setCount(id)} {setCount(id) === 1 ? 'set' : 'sets'}</span>
+            {/if}
+            <span class="text-dim {open ? 'rotate-180' : ''}"><Icon name="chevron" /></span>
+          </button>
+          {#if open}<div class="pb-4"><ExerciseCard exerciseId={id} /></div>{/if}
         </li>
       {/each}
     </ul>
   {/if}
 
   {#if workout.queue.length}
-    <h2 class="mb-2 text-sm font-medium text-dim">Up next (template)</h2>
-    <ul class="card mb-4 divide-y">
+    <h2 class="mb-2 text-xs tracking-[0.1em] text-dim">Up next</h2>
+    <ul class="mb-4 divide-y border-y">
       {#each workout.queue as id (id)}
         <li>
-          <a href={'#/workout/' + id} class="flex min-h-14 items-center gap-3 p-2">
-            {#if names[id]}<Badge initials={names[id].initials} />{/if}
-            <span class="flex-1">{names[id]?.name ?? '…'}</span>
-          </a>
+          <button type="button" class="flex min-h-14 w-full items-center gap-3 text-left text-dim" onclick={() => openExercise(id)}>
+            <span class="flex-1 font-display text-xl tracking-[0.04em] uppercase">{names[id]?.name ?? '…'}</span>
+            <Icon name="plus" size={18} />
+            <span class="sr-only">Start this exercise</span>
+          </button>
         </li>
       {/each}
     </ul>
@@ -152,7 +180,7 @@
         <h2 class="font-medium">Pick an exercise</h2>
         <button type="button" class="btn" onclick={() => (picking = false)}>Close</button>
       </div>
-      <ExercisePicker onPick={(e) => go('workout/' + e.id)} />
+      <ExercisePicker onPick={(e) => openExercise(e.id)} />
     </div>
   {:else}
     <button type="button" class="btn mb-3 w-full" onclick={() => (picking = true)}><Icon name="plus" size={18} />Add exercise</button>

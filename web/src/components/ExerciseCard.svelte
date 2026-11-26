@@ -1,20 +1,18 @@
 <script lang="ts">
-  import Icon from '../components/Icon.svelte'
-  import Badge from '../components/Badge.svelte'
-  import ErrorText from '../components/ErrorText.svelte'
+  import ErrorText from './ErrorText.svelte'
+  import Icon from './Icon.svelte'
   import { api, errorMessage } from '../lib/api'
   import { nextSetType, round2, setLabels, unitLabel } from '../lib/format'
-  import { go, route } from '../lib/router.svelte'
   import type { SetInput, Unit } from '../lib/types'
-  import { blankRow, loadOpen, newKey, openCard, workout, type Card, type Row } from '../lib/workout.svelte'
+  import { blankRow, newKey, openCard, workout, type Card, type Row } from '../lib/workout.svelte'
 
-  const exerciseId = route.parts[1]
+  // one exercise of the running workout, shown inline under its row on the Workout screen
+  let { exerciseId }: { exerciseId: string } = $props()
   let card = $state<Card | null>(null)
   let error = $state('')
 
   async function init() {
     try {
-      if (!workout.session && !(await loadOpen())) return go('workout')
       await openCard(exerciseId)
       card = workout.cards[exerciseId] // the proxied object, so edits stay in the shared store
     } catch (e) {
@@ -25,6 +23,7 @@
 
   const labels = $derived(card ? setLabels(card.rows.map((r) => r.setType)) : [])
   const calisthenics = $derived(card?.exercise.equipmentType === 'CALISTHENICS')
+  const nextKey = $derived(card?.rows.find((r) => !r.setId)?.key) // the next set to tick is marked red
 
   function input(row: Row, index: number): SetInput | string {
     const weight = Number(row.weight)
@@ -108,6 +107,12 @@
     if (card!.rows.length === 0) card!.rows.push({ ...blankRow(card!.unit), key: newKey() })
   }
 
+  // ticked cells read as plain numbers (still editable); the next set's cells are outlined red
+  function cellClass(row: Row) {
+    if (row.setId) return 'border-transparent bg-transparent focus:border-ink'
+    return row.key === nextKey ? 'border-live text-ink' : ''
+  }
+
   const KG_PER_LB = 0.45359237
   function convert(value: number, from: Unit, to: Unit) {
     if (from === to) return value
@@ -129,18 +134,12 @@
   }
 </script>
 
-<a href="#/workout" class="mb-3 inline-flex min-h-11 items-center gap-1 font-display text-sm tracking-[0.08em] text-dim uppercase"><Icon name="back" size={18} />Workout</a>
 <ErrorText message={error} />
 
 {#if card}
-  <div class="mb-3 flex items-center gap-3">
-    <Badge initials={card.exercise.initials} />
-    <h1 class="text-3xl leading-none">{card.exercise.name}</h1>
-  </div>
-
   {#if calisthenics}
-    <label class="mb-3 flex items-center gap-2 text-sm">
-      <span class="text-dim">Bodyweight</span>
+    <label class="mb-2 flex items-center gap-2 text-sm">
+      <span class="font-display text-xs tracking-[0.1em] text-dim uppercase">Bodyweight</span>
       <input
         class="input w-24 {card.bodyweight ? '' : 'border-live'}"
         inputmode="decimal"
@@ -153,12 +152,12 @@
   {/if}
 
   <table class="w-full text-center">
-    <thead class="text-sm text-dim">
+    <thead class="font-display text-xs tracking-[0.1em] text-dim uppercase">
       <tr>
-        <th class="w-14 py-1 font-medium">Set</th>
-        <th class="py-1 font-medium">
+        <th class="w-12 py-1 font-normal">Set</th>
+        <th class="py-1 font-normal">
           <select
-            class="min-h-11 rounded bg-transparent font-medium"
+            class="min-h-11 bg-transparent tracking-[0.1em] uppercase"
             aria-label="Weight unit"
             value={card.unit}
             onchange={(e) => switchUnit(e.currentTarget.value as Unit)}
@@ -166,27 +165,27 @@
             <option value="KG">KG</option>
             <option value="LB">LB</option>
           </select>
-          <span class="block text-xs font-normal">{card.exercise.weightLabel}</span>
+          <span class="block text-[11px] tracking-normal text-faint normal-case">{card.exercise.weightLabel}</span>
         </th>
-        <th class="py-1 font-medium">Reps</th>
-        <th class="w-14 py-1 font-medium">Done</th>
+        <th class="py-1 font-normal">Reps</th>
+        <th class="w-12 py-1 font-normal">Done</th>
         <th class="w-10"><span class="sr-only">Remove</span></th>
       </tr>
     </thead>
     <tbody>
       {#each card.rows as row, i (row.key)}
-        <tr class={row.setId ? '' : 'text-dim'}>
+        <tr class="border-t {row.setId ? '' : 'text-dim'}">
           <td class="py-1">
             <button
               type="button"
-              class="min-h-11 w-12 font-display text-lg font-semibold {row.setType === 'FAILURE' ? 'text-live' : row.setType === 'WARMUP' ? 'text-dim' : ''}"
+              class="min-h-11 w-12 font-display text-lg font-semibold {row.setType === 'FAILURE' ? 'text-live' : row.setType === 'WARMUP' ? 'text-dim' : row.key === nextKey ? 'text-ink' : ''}"
               aria-label="Set type {labels[i]}, tap to change"
               onclick={() => cycle(row, i)}>{labels[i]}</button
             >
           </td>
           <td class="px-1 py-1">
             <input
-              class="input text-center"
+              class="input text-center font-display text-xl {cellClass(row)}"
               inputmode="decimal"
               aria-label="Weight set {labels[i]}"
               bind:value={row.weight}
@@ -196,7 +195,7 @@
           </td>
           <td class="px-1 py-1">
             <input
-              class="input text-center"
+              class="input text-center font-display text-xl {cellClass(row)}"
               inputmode="numeric"
               aria-label="Reps set {labels[i]}"
               bind:value={row.reps}
@@ -229,6 +228,5 @@
     </tbody>
   </table>
 
-  <button type="button" class="btn mt-3 w-full" onclick={addRow}><Icon name="plus" size={18} />Add set</button>
-  <a href="#/workout" class="btn btn-primary mt-3 w-full">Done with this exercise</a>
+  <button type="button" class="btn mt-2 w-full text-dim" onclick={addRow}><Icon name="plus" size={18} />Add set</button>
 {/if}
