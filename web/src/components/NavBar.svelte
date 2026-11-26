@@ -10,7 +10,7 @@
   const current = $derived(route.parts[0] ?? '')
 </script>
 
-<nav class="fixed inset-x-0 bottom-0 border-t bg-ground pb-[env(safe-area-inset-bottom)]" aria-label="Main">
+<nav class="border-t bg-ground pb-[env(safe-area-inset-bottom)]" aria-label="Main">
   <ul class="mx-auto flex max-w-xl">
     {#each tabs as t}
       <li class="flex-1">

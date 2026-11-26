@@ -134,6 +134,18 @@ export async function finishWorkout() {
   go('summary/' + open.id)
 }
 
+/** Throws the running workout away, sets included, after a confirmation that names the set count. */
+export async function discardWorkout() {
+  const open = await loadOpen()
+  if (!open) return go('workout')
+  const n = open.sets.length
+  const what = n ? `this workout and its ${n} logged set${n === 1 ? '' : 's'}` : 'this workout'
+  if (!(await confirmAction(`Discard ${what}? This cannot be undone.`, 'Discard workout', true))) return
+  await api.deleteSession(open.id)
+  reset()
+  go('workout')
+}
+
 function reset() {
   workout.session = null
   workout.cards = {}

@@ -7,7 +7,7 @@
   import { api, errorMessage } from '../lib/api'
   import { longDate, time, today } from '../lib/format'
   import type { Exercise, Gym, Template } from '../lib/types'
-  import { exerciseOrder, finishWorkout, loadOpen, openCard, startWorkout, workout } from '../lib/workout.svelte'
+  import { discardWorkout, exerciseOrder, finishWorkout, loadOpen, openCard, startWorkout, workout } from '../lib/workout.svelte'
 
   let loading = $state(true)
   let error = $state('')
@@ -91,6 +91,14 @@
 
   function setCount(exerciseId: string) {
     return workout.session?.sets.filter((s) => s.exerciseId === exerciseId).length ?? 0
+  }
+
+  async function discard() {
+    try {
+      await discardWorkout()
+    } catch (e) {
+      error = errorMessage(e)
+    }
   }
 
   async function finish() {
@@ -186,4 +194,5 @@
     <button type="button" class="btn mb-3 w-full" onclick={() => (picking = true)}><Icon name="plus" size={18} />Add exercise</button>
   {/if}
   <button type="button" class="btn btn-primary w-full" onclick={finish}>Finish workout</button>
+  <button type="button" class="mt-2 flex min-h-11 w-full items-center justify-center font-display text-sm tracking-[0.08em] text-dim uppercase" onclick={discard}>Discard workout</button>
 {/if}
