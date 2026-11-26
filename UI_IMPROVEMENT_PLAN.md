@@ -1,6 +1,6 @@
 # UI improvement plan
 
-Status: **planned, not started.** Branch: `feat/ui-improvement`. Do not merge into `main`
+Status: **steps 1–4 done 2026-11-26, waiting for the developer's review.** Branch: `feat/ui-improvement`. Do not merge into `main`
 until the developer says the UI is stable (`git switch main && git merge --no-ff feat/ui-improvement`).
 Written 2026-11-26.
 

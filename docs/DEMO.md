@@ -71,7 +71,8 @@ on the phone over Tailscale (README). Keep a terminal and the IDE open beside it
    which only calisthenics allows (`validateWeight` override).
 5. Add One-Arm Dumbbell Row and tick a set: it shows "… kg each"
    (`DumbbellExercise.formatSet`).
-6. Navigate to History and back: the unticked rows are still there.
+6. Navigate to History: the workout bar shows the running clock. Tap Resume:
+   the unticked rows are still there.
 7. Finish workout → **Summary**: sets, working sets and volume, per-exercise
    top and average. `VolumeCalculable` is implemented by `WorkoutSet` and
    `WorkoutSession`. Switch kg → lb. Save as template "Push".

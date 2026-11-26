@@ -136,7 +136,18 @@ Svelte 5 (runes) with hash routing and no router library. A bottom tab bar
 holds Workout, Exercises, History and More. A module-level workout store keeps
 unsaved set rows while you move between screens. The progression chart is
 hand-written SVG. The layout is designed for a 390 px wide phone with 44 px tap
-targets. Reloading during a workout asks whether to resume or finish it.
+targets.
+
+The look is black with red accents: white ink on matte black, one grey ramp,
+and red only for time and live state (the workout clock, the open exercise's
+count, the next set, the active tab). Headings, labels and numbers use Oswald,
+body text Barlow; both are self-hosted in `web/public/fonts`. Corners are square
+and groups are divided by hairlines, not cards. Tokens live in `web/src/app.css`.
+
+During a workout the exercises open in place on the Workout screen, one at a
+time, instead of on a page of their own. On every other tab a bar above the tabs
+shows the running clock with **Resume** and **End**; End finishes and saves the
+workout or discards it after a confirmation that names the set count.
 
 ## 9. Security
 

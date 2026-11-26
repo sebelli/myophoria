@@ -183,9 +183,10 @@ call one service method, turn the result into a `*Dto` record.
 
 ```
 main.ts → App.svelte ── picks a screen from the URL hash (lib/router)
-  ├── components/  NavBar, StatusBanner (GET /status), ConfirmDialog,
-  │                ExercisePicker, ProgressChart (SVG), Badge, ErrorText
-  ├── screens/     Workout, ExerciseCard, Summary, History, SessionDetail,
+  ├── components/  NavBar, ActiveWorkoutBar, StatusBanner (GET /status),
+  │                ConfirmDialog, ExercisePicker, ExerciseCard (inline set table),
+  │                ProgressChart (SVG), Clock, Icon (SVG), Badge, ErrorText
+  ├── screens/     Workout, Summary, History, SessionDetail,
   │                Exercises, ExerciseDetail, Templates, Gyms, Bodyweight,
   │                Data, More
   └── lib/
@@ -217,7 +218,7 @@ Main.main
 ### Logging a set (the main path)
 
 ```
-ExerciseCard.svelte  tick checkbox
+components/ExerciseCard.svelte  tick checkbox
  └─ api.addSet(sessionId, SetInput)            POST /api/v1/sessions/{id}/sets
      └─ Main before-filter: Host/Origin allowed?            (else 403)
          └─ WorkoutController → ctx.bodyAsClass(SetInput)  (bad JSON → 400)
