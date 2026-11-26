@@ -7,13 +7,13 @@
   ]
 </script>
 
-<h1 class="mb-4 text-xl font-semibold">More</h1>
+<h1 class="mb-4 text-3xl leading-none">More</h1>
 <ul class="card divide-y">
   {#each links as l}
     <li>
       <a href={l.href} class="block min-h-14 p-3">
         <span class="block font-medium">{l.label}</span>
-        <span class="block text-sm text-slate-600">{l.text}</span>
+        <span class="block text-sm text-dim">{l.text}</span>
       </a>
     </li>
   {/each}

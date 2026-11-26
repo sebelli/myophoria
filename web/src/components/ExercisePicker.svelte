@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from './Icon.svelte'
   import { api, errorMessage } from '../lib/api'
   import { typeLabel } from '../lib/format'
   import { EQUIPMENT_TYPES, type EquipmentType, type Exercise, type Laterality } from '../lib/types'
@@ -57,7 +58,7 @@
     {#each EQUIPMENT_TYPES as t}
       <button
         type="button"
-        class="min-h-11 rounded-full border px-3 text-sm {types.includes(t) ? 'border-slate-800 bg-slate-800 text-white' : 'border-slate-300 bg-white'}"
+        class="min-h-11 border px-3 font-display text-[13px] tracking-[0.08em] uppercase {types.includes(t) ? 'border-ink bg-ink text-ground' : 'border-edge text-dim'}"
         aria-pressed={types.includes(t)}
         onclick={() => toggle(t)}>{typeLabel(t)}</button
       >
@@ -72,13 +73,13 @@
           <Badge initials={ex.initials} />
           <span class="flex-1">
             <span class="block font-medium">{ex.name}</span>
-            <span class="block text-sm text-slate-600">{typeLabel(ex.equipmentType)}</span>
+            <span class="block text-sm text-dim">{typeLabel(ex.equipmentType)}</span>
           </span>
         </button>
       </li>
     {:else}
       {#if loaded}
-        <li class="p-3 text-slate-600">
+        <li class="p-3 text-dim">
           {query || types.length ? 'No exercise matches.' : 'Your library is empty. Add your first exercise below.'}
         </li>
       {/if}
@@ -102,6 +103,6 @@
       </div>
     </form>
   {:else}
-    <button type="button" class="btn w-full" onclick={() => ((adding = true), (name = query))}>+ Add exercise</button>
+    <button type="button" class="btn w-full" onclick={() => ((adding = true), (name = query))}><Icon name="plus" size={18} />Add exercise</button>
   {/if}
 </div>

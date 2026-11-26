@@ -33,6 +33,14 @@ export function time(iso: string | null): string {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
+/** Time since an ISO instant: "5:07", "42:13", "1:02:13"; never negative. */
+export function elapsed(since: string, now: number): string {
+  const s = Math.max(0, Math.floor((now - Date.parse(since)) / 1000))
+  const h = Math.floor(s / 3600)
+  const mmss = `${String(Math.floor((s % 3600) / 60)).padStart(h ? 2 : 1, '0')}:${String(s % 60).padStart(2, '0')}`
+  return h ? `${h}:${mmss}` : mmss
+}
+
 /** "Tue 25 Nov 2026" */
 export function longDate(date: string): string {
   const [y, m, d] = date.split('-').map(Number)

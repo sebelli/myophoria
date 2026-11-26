@@ -1,44 +1,154 @@
 @import "tailwindcss";
 
-/* Tailwind v4 borders default to the text colour; use a light grey like v3 did. */
+/* Self-hosted (SIL OFL, see public/fonts/LICENSE.md): nothing is fetched from a font CDN. */
+@font-face {
+  font-family: "Oswald";
+  font-weight: 200 700;
+  font-display: swap;
+  src: url("/fonts/oswald-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Oswald";
+  font-weight: 200 700;
+  font-display: swap;
+  src: url("/fonts/oswald-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Barlow";
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/barlow-400-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Barlow";
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/barlow-400-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Barlow";
+  font-weight: 500 700;
+  font-display: swap;
+  src: url("/fonts/barlow-600-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Barlow";
+  font-weight: 500 700;
+  font-display: swap;
+  src: url("/fonts/barlow-600-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Wall Clock world: matte black, white ink, one grey ramp, red only for time and live state. */
+@theme {
+  --color-ground: #000000;
+  --color-field: #0f0f0f;
+  --color-line: #242424;
+  --color-edge: #3a3a3a;
+  --color-faint: #5e5e5e;
+  --color-dim: #8c8c8c;
+  --color-ink: #f2f2f2;
+  --color-live: #e8392f;
+  --font-sans: "Barlow", system-ui, sans-serif;
+  --font-display: "Oswald", "Barlow", system-ui, sans-serif;
+}
+
 @layer base {
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-slate-200, currentColor);
+    border-color: var(--color-line);
+  }
+  html {
+    color-scheme: dark; /* native selects, date pickers and dialogs render dark */
+    scrollbar-color: var(--color-edge) var(--color-ground);
+  }
+  body {
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+    caret-color: var(--color-live);
+    -webkit-tap-highlight-color: transparent;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  ::selection {
+    background: var(--color-live);
+    color: var(--color-ground);
+  }
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  summary {
+    list-style: none;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
   }
 }
 
-/* Shared building blocks; 44px minimum tap targets (handoff §8.3). */
+/* Shared building blocks; square corners, hairlines, 44px+ tap targets (handoff §8.3). */
 @layer components {
   .btn {
-    @apply inline-flex min-h-11 items-center justify-center rounded border border-slate-300 bg-white px-4 text-sm font-medium;
+    @apply inline-flex min-h-12 items-center justify-center gap-2 border border-edge bg-transparent px-4 font-display text-[15px] tracking-[0.08em] text-ink uppercase;
+  }
+  .btn:disabled {
+    @apply border-line text-faint;
   }
   .btn-primary {
-    @apply border-slate-800 bg-slate-800 text-white;
+    @apply border-ink bg-ink text-ground;
   }
   .btn-danger {
-    @apply border-red-700 bg-red-700 text-white;
+    @apply border-live text-live;
   }
   .input {
-    @apply min-h-11 w-full rounded border border-slate-300 bg-white px-2;
+    @apply min-h-11 w-full border border-edge bg-field px-2 text-ink placeholder:text-dim;
+  }
+  .input:focus {
+    @apply border-ink;
+  }
+  .input:disabled {
+    @apply border-line text-dim;
+  }
+  .input::file-selector-button {
+    @apply mr-3 min-h-10 border-0 border-r border-edge bg-transparent pr-3 font-display text-[13px] tracking-[0.08em] text-ink uppercase;
   }
   .card {
-    @apply rounded-lg border border-slate-200 bg-white;
+    @apply border-y border-line;
   }
   .label {
-    @apply mb-1 block text-sm text-slate-600;
+    @apply mb-1 block font-display text-xs tracking-[0.1em] text-dim uppercase;
+  }
+  /* set "done" box: square, white when ticked */
+  .tick {
+    @apply grid size-8 cursor-pointer appearance-none place-content-center border-2 border-edge;
+  }
+  .tick:checked {
+    @apply border-ink bg-ink;
+  }
+  .tick:checked::before {
+    content: "";
+    @apply block size-5 bg-ground;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='square'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  .tick:disabled {
+    @apply opacity-50;
   }
 }
 
 :focus-visible {
-  outline: 2px solid #0f172a;
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
-}
-
-body {
-  background: #f8fafc;
-  color: #0f172a;
 }

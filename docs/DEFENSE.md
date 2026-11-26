@@ -28,7 +28,7 @@ Related: [DESIGN.md](DESIGN.md) (architecture), [uml/classes.md](uml/classes.md)
 
 | Step | Where | What happens |
 |---|---|---|
-| 1 | `web/src/screens/ExerciseCard.svelte:57` | The tick checks the row in the browser (`input()`), then calls `api.addSet` |
+| 1 | `web/src/components/ExerciseCard.svelte:57` | The tick checks the row in the browser (`input()`), then calls `api.addSet` |
 | 2 | `web/src/lib/api.ts:82` → `:18` | `request('POST', '/sessions/{id}/sets', body)` does a `fetch` of `/api/v1/...` with JSON |
 | 3 | `src/main/java/myophoria/api/Main.java:94` | `before("/api/*")` filter: `hostAllowed` checks the Host and Origin headers, else 403 |
 | 4 | `api/WorkoutController.java:75` | Route handler: `ctx.bodyAsClass(SetInput.class)` (Jackson builds the record), then `workouts.addSet(...)` |

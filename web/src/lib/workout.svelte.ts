@@ -29,7 +29,8 @@ export const workout = $state<{
   session: Session | null
   cards: Record<string, Card>
   queue: string[] // template exercises not opened yet
-}>({ session: null, cards: {}, queue: [] })
+  open: string | null // the exercise expanded on the Workout screen (one at a time)
+}>({ session: null, cards: {}, queue: [], open: null })
 
 let nextKey = 1
 export const newKey = () => nextKey++
@@ -60,6 +61,7 @@ export async function loadOpen(): Promise<Session | null> {
   if (!s || s.id !== workout.session?.id) {
     workout.cards = {}
     workout.queue = s ? loadQueue(s.id) : []
+    workout.open = null
   }
   workout.session = s
   return s
@@ -69,6 +71,7 @@ export async function startWorkout(gymId: string, localDate: string, queue: stri
   workout.session = await api.startSession(gymId, localDate)
   workout.cards = {}
   workout.queue = queue
+  workout.open = null
   saveQueue()
 }
 
@@ -131,9 +134,22 @@ export async function finishWorkout() {
   go('summary/' + open.id)
 }
 
+/** Throws the running workout away, sets included, after a confirmation that names the set count. */
+export async function discardWorkout() {
+  const open = await loadOpen()
+  if (!open) return go('workout')
+  const n = open.sets.length
+  const what = n ? `this workout and its ${n} logged set${n === 1 ? '' : 's'}` : 'this workout'
+  if (!(await confirmAction(`Discard ${what}? This cannot be undone.`, 'Discard workout', true))) return
+  await api.deleteSession(open.id)
+  reset()
+  go('workout')
+}
+
 function reset() {
   workout.session = null
   workout.cards = {}
   workout.queue = []
+  workout.open = null
   saveQueue()
 }

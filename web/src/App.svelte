@@ -1,14 +1,11 @@
 <script lang="ts">
   import type { Component } from 'svelte'
+  import ActiveWorkoutBar from './components/ActiveWorkoutBar.svelte'
   import ConfirmDialog from './components/ConfirmDialog.svelte'
   import NavBar from './components/NavBar.svelte'
   import StatusBanner from './components/StatusBanner.svelte'
   import { route } from './lib/router.svelte'
-  import { api } from './lib/api'
-  import { choose } from './lib/dialog.svelte'
-  import { go } from './lib/router.svelte'
-  import { finishWorkout } from './lib/workout.svelte'
-  import ExerciseCard from './screens/ExerciseCard.svelte'
+  import { loadOpen, workout } from './lib/workout.svelte'
   import ExerciseDetail from './screens/ExerciseDetail.svelte'
   import Exercises from './screens/Exercises.svelte'
   import Bodyweight from './screens/Bodyweight.svelte'
@@ -34,32 +31,25 @@
     data: Data,
   }
   const Screen = $derived(
-    route.parts[0] === 'workout' && route.parts[1]
-      ? ExerciseCard
-      : route.parts[0] === 'exercises' && route.parts[1]
-        ? ExerciseDetail
-        : route.parts[0] === 'history' && route.parts[1]
-          ? SessionDetail
-          : (screens[route.parts[0] ?? ''] ?? Workout),
+    route.parts[0] === 'exercises' && route.parts[1]
+      ? ExerciseDetail
+      : route.parts[0] === 'history' && route.parts[1]
+        ? SessionDetail
+        : (screens[route.parts[0] ?? ''] ?? Workout), // an old #/workout/<id> link lands on Workout
   )
 
-  // reopening the app mid-workout offers "Resume or finish" (handoff §8.6)
-  api.openSession().then(async (open) => {
-    if (!open || route.parts[0] === 'workout' || route.parts.length === 0) return
-    const answer = await choose('A workout is still running.', [
-      { label: 'Finish it', value: 'finish' },
-      { label: 'Resume', value: 'resume' },
-    ])
-    if (answer === 'resume') go('workout')
-    if (answer === 'finish') finishWorkout()
-  }).catch(() => {})
+  // reopening the app mid-workout fills the store, so the workout bar offers Resume and End
+  loadOpen().catch(() => {})
 </script>
 
 <StatusBanner />
-<main class="mx-auto max-w-xl px-4 pt-4 pb-24">
+<main class="mx-auto max-w-xl px-4 pt-4 {workout.session ? 'pb-40' : 'pb-24'}">
   {#key route.parts.join('/')}
     <Screen />
   {/key}
 </main>
-<NavBar />
+<div class="fixed inset-x-0 bottom-0">
+  <ActiveWorkoutBar />
+  <NavBar />
+</div>
 <ConfirmDialog />

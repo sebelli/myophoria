@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte'
   import Badge from '../components/Badge.svelte'
   import ErrorText from '../components/ErrorText.svelte'
   import { api, ApiError, errorMessage } from '../lib/api'
@@ -92,7 +93,7 @@
 </script>
 
 <div class="mb-4 flex items-center justify-between">
-  <h1 class="text-xl font-semibold">{showDeleted ? 'Deleted exercises' : 'Exercises'}</h1>
+  <h1 class="text-3xl leading-none">{showDeleted ? 'Deleted exercises' : 'Exercises'}</h1>
   <button type="button" class="btn" onclick={() => (showDeleted = !showDeleted)}>{showDeleted ? 'Show active' : 'Show deleted'}</button>
 </div>
 
@@ -103,7 +104,7 @@
     {#each EQUIPMENT_TYPES as t}
       <button
         type="button"
-        class="min-h-11 rounded-full border px-3 text-sm {types.includes(t) ? 'border-slate-800 bg-slate-800 text-white' : 'border-slate-300 bg-white'}"
+        class="min-h-11 border px-3 font-display text-[13px] tracking-[0.08em] uppercase {types.includes(t) ? 'border-ink bg-ink text-ground' : 'border-edge text-dim'}"
         aria-pressed={types.includes(t)}
         onclick={() => toggle(t)}>{typeLabel(t)}</button
       >
@@ -128,7 +129,7 @@
         </div>
       </form>
     {:else}
-      <button type="button" class="btn w-full" onclick={() => (adding = true)}>+ Add exercise</button>
+      <button type="button" class="btn w-full" onclick={() => (adding = true)}><Icon name="plus" size={18} />Add exercise</button>
     {/if}
   {/if}
 
@@ -139,13 +140,13 @@
           <Badge initials={ex.initials} deleted={ex.deleted} />
           <span class="flex-1">
             <span class="block font-medium">{ex.name}</span>
-            <span class="block text-sm text-slate-600">{typeLabel(ex.equipmentType)} · {ex.laterality.toLowerCase()}</span>
+            <span class="block text-sm text-dim">{typeLabel(ex.equipmentType)} · {ex.laterality.toLowerCase()}</span>
           </span>
         </button>
       </li>
     {:else}
       {#if loaded}
-        <li class="p-3 text-slate-600">
+        <li class="p-3 text-dim">
           {showDeleted ? 'No deleted exercises.' : query || types.length ? 'No exercise matches.' : 'No exercises yet. Add your first one above.'}
         </li>
       {/if}

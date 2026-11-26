@@ -105,3 +105,15 @@ One entry per decision: date, decision, reason.
 ## 2026-11-25 — Generated UML (T7.1)
 **Decision:** `docs/uml/classes.md` is generated from `javap -p` output of the compiled classes, with id references and the curated "uses" arrows added by hand.
 **Reason:** A diagram typed by hand drifts from the code. Generating it guarantees every field and method signature matches.
+
+## 2026-11-26 — Black and red "wall clock" theme
+**Decision:** The UI is white on matte black with one grey ramp; red is used only for time and live state. Oswald (headings, labels, numbers) and Barlow (body) are self-hosted; corners are square and hairlines replace cards. The direction was picked from Impeccable's decision page (Wall Clock) and is recorded in `.impeccable/surfaces/`.
+**Reason:** The developer asked for a minimalist red and black UI. Self-hosting keeps the app private (no font CDN request from the phone) and needs no npm dependency.
+
+## 2026-11-26 — Exercises open in place during a workout
+**Decision:** The exercise card is an inline section under its row on the Workout screen, one open at a time, instead of the `#/workout/<id>` page. The open exercise is kept in the workout store so Resume returns to it.
+**Reason:** Fewer taps and no back-and-forth between pages while logging; one open card keeps the list short on a phone.
+
+## 2026-11-26 — Active workout bar replaces the startup popup
+**Decision:** While a workout runs, a bar above the tabs on every other tab shows its clock with Resume and End. End finishes and saves the workout, or discards it after a confirmation naming the set count. The Workout screen also has a Discard workout action.
+**Reason:** A running workout should be visible and easy to end without a popup on every reload, and discarding it must not require a trip to History.

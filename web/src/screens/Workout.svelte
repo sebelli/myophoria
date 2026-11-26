@@ -1,12 +1,13 @@
 <script lang="ts">
-  import Badge from '../components/Badge.svelte'
+  import Icon from '../components/Icon.svelte'
+  import Clock from '../components/Clock.svelte'
   import ErrorText from '../components/ErrorText.svelte'
+  import ExerciseCard from '../components/ExerciseCard.svelte'
   import ExercisePicker from '../components/ExercisePicker.svelte'
   import { api, errorMessage } from '../lib/api'
   import { longDate, time, today } from '../lib/format'
-  import { go } from '../lib/router.svelte'
   import type { Exercise, Gym, Template } from '../lib/types'
-  import { exerciseOrder, finishWorkout, loadOpen, startWorkout, workout } from '../lib/workout.svelte'
+  import { discardWorkout, exerciseOrder, finishWorkout, loadOpen, openCard, startWorkout, workout } from '../lib/workout.svelte'
 
   let loading = $state(true)
   let error = $state('')
@@ -36,6 +37,9 @@
         templates = tpl
       } else {
         await loadNames()
+        // a fresh load (no card built yet) reopens the exercise of the last logged set
+        const last = open.sets.at(-1)
+        if (last && Object.keys(workout.cards).length === 0) await openExercise(last.exerciseId)
       }
     } catch (e) {
       error = errorMessage(e)
@@ -67,13 +71,44 @@
     }
   }
 
+  // one exercise open at a time; opening builds its card (prefill) first
+  async function openExercise(id: string) {
+    try {
+      await openCard(id)
+      await loadNames()
+      workout.open = id
+      picking = false
+    } catch (e) {
+      error = errorMessage(e)
+    }
+  }
+
+  function toggle(id: string) {
+    if (workout.open === id) workout.open = null
+    else openExercise(id)
+  }
+
+  function ticked(id: string) {
+    return workout.cards[id]?.rows.filter((r) => r.setId).length ?? 0
+  }
+
   function setCount(exerciseId: string) {
     return workout.session?.sets.filter((s) => s.exerciseId === exerciseId).length ?? 0
+  }
+
+  async function discard() {
+    try {
+      await discardWorkout()
+      if (!workout.session) await init() // discarded in place: load the gyms and templates for a new start
+    } catch (e) {
+      error = errorMessage(e)
+    }
   }
 
   async function finish() {
     try {
       await finishWorkout()
+      if (!workout.session) await init() // discarded in place: load the gyms and templates for a new start
     } catch (e) {
       error = errorMessage(e)
     }
@@ -83,9 +118,9 @@
 </script>
 
 {#if loading}
-  <p class="text-slate-600">Loading…</p>
+  <p class="text-dim">Loading…</p>
 {:else if !workout.session}
-  <h1 class="mb-4 text-xl font-semibold">Start workout</h1>
+  <h1 class="mb-4 text-3xl leading-none">Start workout</h1>
   <div class="card space-y-3 p-3">
     <label class="block">
       <span class="label">Gym</span>
@@ -106,35 +141,47 @@
   </div>
   <ErrorText message={error} />
 {:else}
-  <div class="mb-4 flex items-baseline justify-between gap-2">
-    <h1 class="text-xl font-semibold">Workout</h1>
-    <span class="text-sm text-slate-600">{longDate(workout.session.localDate)} · started {time(workout.session.startedAt)}{gymName ? ' · ' + gymName : ''}</span>
-  </div>
+  <header class="-mx-4 -mt-4 mb-4 flex items-end justify-between gap-3 border-b px-4 pt-4 pb-3">
+    <h1 class="sr-only">Workout</h1>
+    <Clock since={workout.session.startedAt} class="text-6xl" />
+    <p class="text-right text-[13px] leading-relaxed text-dim">
+      {#if gymName}<span class="block text-[15px] font-semibold text-ink">{gymName}</span>{/if}
+      {longDate(workout.session.localDate)} · from {time(workout.session.startedAt)}
+    </p>
+  </header>
   <ErrorText message={error} />
 
   {#if exerciseOrder().length}
-    <ul class="card mb-4 divide-y">
+    <ul class="mb-4 divide-y border-b">
       {#each exerciseOrder() as id (id)}
+        {@const open = workout.open === id}
+        {@const card = workout.cards[id]}
         <li>
-          <a href={'#/workout/' + id} class="flex min-h-14 items-center gap-3 p-2">
-            {#if names[id]}<Badge initials={names[id].initials} />{/if}
-            <span class="flex-1 font-medium">{names[id]?.name ?? '…'}</span>
-            <span class="text-sm text-slate-600">{setCount(id)} sets</span>
-          </a>
+          <button type="button" class="flex min-h-14 w-full items-center gap-3 text-left" aria-expanded={open} onclick={() => toggle(id)}>
+            <span class="flex-1 font-display text-xl tracking-[0.04em] uppercase {open ? 'text-ink' : 'text-dim'}">{names[id]?.name ?? '…'}</span>
+            {#if open && card}
+              <span class="font-display text-base text-live" aria-label="{ticked(id)} of {card.rows.length} sets done">{ticked(id)}/{card.rows.length}</span>
+            {:else}
+              <span class="text-sm text-dim">{setCount(id)} {setCount(id) === 1 ? 'set' : 'sets'}</span>
+            {/if}
+            <span class="text-dim {open ? 'rotate-180' : ''}"><Icon name="chevron" /></span>
+          </button>
+          {#if open}<div class="pb-4"><ExerciseCard exerciseId={id} /></div>{/if}
         </li>
       {/each}
     </ul>
   {/if}
 
   {#if workout.queue.length}
-    <h2 class="mb-2 text-sm font-medium text-slate-600">Up next (template)</h2>
-    <ul class="card mb-4 divide-y">
+    <h2 class="mb-2 text-xs tracking-[0.1em] text-dim">Up next</h2>
+    <ul class="mb-4 divide-y border-y">
       {#each workout.queue as id (id)}
         <li>
-          <a href={'#/workout/' + id} class="flex min-h-14 items-center gap-3 p-2">
-            {#if names[id]}<Badge initials={names[id].initials} />{/if}
-            <span class="flex-1">{names[id]?.name ?? '…'}</span>
-          </a>
+          <button type="button" class="flex min-h-14 w-full items-center gap-3 text-left text-dim" onclick={() => openExercise(id)}>
+            <span class="flex-1 font-display text-xl tracking-[0.04em] uppercase">{names[id]?.name ?? '…'}</span>
+            <Icon name="plus" size={18} />
+            <span class="sr-only">Start this exercise</span>
+          </button>
         </li>
       {/each}
     </ul>
@@ -146,10 +193,11 @@
         <h2 class="font-medium">Pick an exercise</h2>
         <button type="button" class="btn" onclick={() => (picking = false)}>Close</button>
       </div>
-      <ExercisePicker onPick={(e) => go('workout/' + e.id)} />
+      <ExercisePicker onPick={(e) => openExercise(e.id)} />
     </div>
   {:else}
-    <button type="button" class="btn mb-3 w-full" onclick={() => (picking = true)}>+ Add exercise</button>
+    <button type="button" class="btn mb-3 w-full" onclick={() => (picking = true)}><Icon name="plus" size={18} />Add exercise</button>
   {/if}
   <button type="button" class="btn btn-primary w-full" onclick={finish}>Finish workout</button>
+  <button type="button" class="mt-2 flex min-h-11 w-full items-center justify-center font-display text-sm tracking-[0.08em] text-dim uppercase" onclick={discard}>Discard workout</button>
 {/if}
