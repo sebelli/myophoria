@@ -10,7 +10,7 @@
 
 <dialog
   bind:this={el}
-  class="m-auto w-[min(28rem,calc(100%-2rem))] rounded-lg p-4 shadow-xl backdrop:bg-black/40"
+  class="m-auto w-[min(28rem,calc(100%-2rem))] border border-edge bg-field p-4 text-ink backdrop:bg-ground/80"
   oncancel={(e) => {
     e.preventDefault()
     closeDialog(null)

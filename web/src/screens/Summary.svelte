@@ -29,7 +29,7 @@
 </script>
 
 <div class="mb-4 flex items-center justify-between">
-  <h1 class="text-xl font-semibold">Summary</h1>
+  <h1 class="text-3xl leading-none">Summary</h1>
   <select class="input w-24" aria-label="Unit" bind:value={unit}>
     <option value="KG">kg</option>
     <option value="LB">lb</option>
@@ -38,20 +38,20 @@
 <ErrorText message={error} />
 
 {#if summary}
-  <p class="mb-3 text-sm text-slate-600">
+  <p class="mb-3 text-sm text-dim">
     {longDate(summary.localDate)} · {time(summary.startedAt)}–{time(summary.endedAt)} · {duration(summary.durationSeconds)}
   </p>
   <dl class="mb-4 grid grid-cols-3 gap-2 text-center">
-    <div class="card p-2"><dt class="text-xs text-slate-600">Sets</dt><dd class="text-lg font-semibold">{summary.totalSets}</dd></div>
-    <div class="card p-2"><dt class="text-xs text-slate-600">Working sets</dt><dd class="text-lg font-semibold">{summary.workingSets}</dd></div>
+    <div class="card p-2"><dt class="text-xs text-dim">Sets</dt><dd class="text-lg font-semibold">{summary.totalSets}</dd></div>
+    <div class="card p-2"><dt class="text-xs text-dim">Working sets</dt><dd class="text-lg font-semibold">{summary.workingSets}</dd></div>
     <div class="card p-2">
-      <dt class="text-xs text-slate-600">Volume</dt>
+      <dt class="text-xs text-dim">Volume</dt>
       <dd class="text-lg font-semibold">{Math.round(summary.volume)} {unitLabel(summary.unit)}</dd>
     </div>
   </dl>
 
   <table class="card mb-4 w-full text-sm">
-    <thead class="text-slate-600">
+    <thead class="text-dim">
       <tr><th class="p-2 text-left font-medium">Exercise</th><th class="p-2 font-medium">Sets</th><th class="p-2 font-medium">Top</th><th class="p-2 font-medium">Avg</th></tr>
     </thead>
     <tbody class="divide-y">
@@ -65,10 +65,10 @@
       {/each}
     </tbody>
   </table>
-  <p class="mb-4 text-xs text-slate-500">Top and average use working sets only, in {unitLabel(summary.unit)}.</p>
+  <p class="mb-4 text-xs text-dim">Top and average use working sets only, in {unitLabel(summary.unit)}.</p>
 
   {#if saved}
-    <p class="mb-3 rounded bg-green-50 p-2 text-sm text-green-800">{saved}</p>
+    <p class="mb-3 border border-edge p-2 text-sm">{saved}</p>
   {:else}
     <form class="card mb-4 flex gap-2 p-3" onsubmit={saveTemplate}>
       <input class="input" placeholder="Template name" aria-label="Template name" bind:value={templateName} required />

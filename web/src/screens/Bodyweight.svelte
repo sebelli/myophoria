@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte'
   import ErrorText from '../components/ErrorText.svelte'
   import { api, errorMessage } from '../lib/api'
   import { confirmAction } from '../lib/dialog.svelte'
@@ -71,8 +72,8 @@
   }
 </script>
 
-<a href="#/more" class="mb-3 inline-flex min-h-11 items-center text-sm text-slate-600">← More</a>
-<h1 class="mb-4 text-xl font-semibold">Bodyweight</h1>
+<a href="#/more" class="mb-3 inline-flex min-h-11 items-center gap-1 font-display text-sm tracking-[0.08em] text-dim uppercase"><Icon name="back" size={18} />More</a>
+<h1 class="mb-4 text-3xl leading-none">Bodyweight</h1>
 <ErrorText message={error} />
 
 <form class="card mb-4 space-y-2 p-3" onsubmit={add}>
@@ -109,14 +110,14 @@
         <div class="flex items-center gap-2">
           <span class="flex-1">
             <span class="block font-medium">{num(e.weight)} {unitLabel(e.unit)}</span>
-            <span class="block text-sm text-slate-600">{longDate(e.localDate)} · {time(e.recordedAt)}</span>
+            <span class="block text-sm text-dim">{longDate(e.localDate)} · {time(e.recordedAt)}</span>
           </span>
           <button type="button" class="btn" onclick={() => edit(e)}>Edit</button>
-          <button type="button" class="btn text-red-700" aria-label="Delete entry" onclick={() => remove(e)}>×</button>
+          <button type="button" class="btn text-dim" aria-label="Delete entry" onclick={() => remove(e)}><Icon name="close" /></button>
         </div>
       {/if}
     </li>
   {:else}
-    <li class="p-3 text-slate-600">No entries yet.</li>
+    <li class="p-3 text-dim">No entries yet.</li>
   {/each}
 </ul>

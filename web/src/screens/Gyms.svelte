@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte'
   import ErrorText from '../components/ErrorText.svelte'
   import { api, errorMessage } from '../lib/api'
   import { confirmAction } from '../lib/dialog.svelte'
@@ -40,8 +41,8 @@
   }
 </script>
 
-<a href="#/more" class="mb-3 inline-flex min-h-11 items-center text-sm text-slate-600">← More</a>
-<h1 class="mb-4 text-xl font-semibold">Gyms</h1>
+<a href="#/more" class="mb-3 inline-flex min-h-11 items-center gap-1 font-display text-sm tracking-[0.08em] text-dim uppercase"><Icon name="back" size={18} />More</a>
+<h1 class="mb-4 text-3xl leading-none">Gyms</h1>
 <ErrorText message={error} />
 
 <form class="card mb-4 flex gap-2 p-3" onsubmit={add}>
@@ -69,13 +70,13 @@
         <div class="flex flex-wrap items-center gap-2">
           <span class="flex-1 font-medium">{g.name}</span>
           {#if g.isDefault}
-            <span class="rounded bg-slate-200 px-2 text-xs">default</span>
+            <span class="border border-edge px-2 font-display text-xs tracking-[0.1em] text-dim uppercase">default</span>
           {:else}
             <button type="button" class="btn" onclick={() => run(() => api.makeDefaultGym(g.id))}>Make default</button>
           {/if}
           <button type="button" class="btn" onclick={() => ((renaming = g.id), (newName = g.name))}>Rename</button>
           {#if !g.isDefault}
-            <button type="button" class="btn text-red-700" aria-label="Delete {g.name}" onclick={() => remove(g)}>×</button>
+            <button type="button" class="btn text-dim" aria-label="Delete {g.name}" onclick={() => remove(g)}><Icon name="close" /></button>
           {/if}
         </div>
       {/if}

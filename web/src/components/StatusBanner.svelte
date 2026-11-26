@@ -7,7 +7,7 @@
 </script>
 
 {#if warnings.length}
-  <div class="bg-amber-100 p-3 text-sm text-amber-900" role="alert">
+  <div class="border-b border-live bg-field p-3 text-sm" role="alert">
     {#each warnings as w}<p>{w}</p>{/each}
     <button type="button" class="mt-1 underline" onclick={() => (warnings = [])}>Dismiss</button>
   </div>

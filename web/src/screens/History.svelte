@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte'
   import ErrorText from '../components/ErrorText.svelte'
   import { api, errorMessage } from '../lib/api'
   import { fromLocalInput, longDate, time, today } from '../lib/format'
@@ -55,8 +56,8 @@
 </script>
 
 <div class="mb-4 flex items-center justify-between">
-  <h1 class="text-xl font-semibold">History</h1>
-  <button type="button" class="btn" onclick={() => (backfilling = !backfilling)}>{backfilling ? 'Close' : '+ Past workout'}</button>
+  <h1 class="text-3xl leading-none">History</h1>
+  <button type="button" class="btn" onclick={() => (backfilling = !backfilling)}>{#if backfilling}Close{:else}<Icon name="plus" size={18} />Past workout{/if}</button>
 </div>
 <ErrorText message={error} />
 
@@ -102,14 +103,14 @@
       <a href={'#/history/' + s.id} class="block min-h-14 p-3">
         <span class="flex justify-between">
           <span class="font-medium">{longDate(s.localDate)}</span>
-          {#if s.open}<span class="rounded bg-green-100 px-2 text-xs text-green-800">running</span>{/if}
+          {#if s.open}<span class="border border-live px-2 font-display text-xs tracking-[0.1em] text-live uppercase">running</span>{/if}
         </span>
-        <span class="block text-sm text-slate-600">
+        <span class="block text-sm text-dim">
           {s.gymName ?? 'Unknown gym'} · {s.setCount} sets{s.startedAt ? ' · ' + time(s.startedAt) : ''}{s.endedAt ? '–' + time(s.endedAt) : ''}
         </span>
       </a>
     </li>
   {:else}
-    {#if loaded}<li class="p-3 text-slate-600">No workouts found.</li>{/if}
+    {#if loaded}<li class="p-3 text-dim">No workouts found.</li>{/if}
   {/each}
 </ul>

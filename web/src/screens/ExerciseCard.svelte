@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte'
   import Badge from '../components/Badge.svelte'
   import ErrorText from '../components/ErrorText.svelte'
   import { api, errorMessage } from '../lib/api'
@@ -128,20 +129,20 @@
   }
 </script>
 
-<a href="#/workout" class="mb-3 inline-flex min-h-11 items-center text-sm text-slate-600">← Workout</a>
+<a href="#/workout" class="mb-3 inline-flex min-h-11 items-center gap-1 font-display text-sm tracking-[0.08em] text-dim uppercase"><Icon name="back" size={18} />Workout</a>
 <ErrorText message={error} />
 
 {#if card}
   <div class="mb-3 flex items-center gap-3">
     <Badge initials={card.exercise.initials} />
-    <h1 class="text-xl font-semibold">{card.exercise.name}</h1>
+    <h1 class="text-3xl leading-none">{card.exercise.name}</h1>
   </div>
 
   {#if calisthenics}
     <label class="mb-3 flex items-center gap-2 text-sm">
-      <span class="text-slate-600">Bodyweight</span>
+      <span class="text-dim">Bodyweight</span>
       <input
-        class="input w-24 {card.bodyweight ? '' : 'border-amber-500'}"
+        class="input w-24 {card.bodyweight ? '' : 'border-live'}"
         inputmode="decimal"
         aria-label="Bodyweight"
         placeholder="needed"
@@ -152,7 +153,7 @@
   {/if}
 
   <table class="w-full text-center">
-    <thead class="text-sm text-slate-600">
+    <thead class="text-sm text-dim">
       <tr>
         <th class="w-14 py-1 font-medium">Set</th>
         <th class="py-1 font-medium">
@@ -174,11 +175,11 @@
     </thead>
     <tbody>
       {#each card.rows as row, i (row.key)}
-        <tr class={row.setId ? 'bg-green-50' : 'text-slate-500'}>
+        <tr class={row.setId ? '' : 'text-dim'}>
           <td class="py-1">
             <button
               type="button"
-              class="min-h-11 w-12 rounded font-semibold {row.setType === 'WARMUP' ? 'text-amber-600' : row.setType === 'FAILURE' ? 'text-red-600' : ''}"
+              class="min-h-11 w-12 font-display text-lg font-semibold {row.setType === 'FAILURE' ? 'text-live' : row.setType === 'WARMUP' ? 'text-dim' : ''}"
               aria-label="Set type {labels[i]}, tap to change"
               onclick={() => cycle(row, i)}>{labels[i]}</button
             >
@@ -205,7 +206,7 @@
           <td class="py-1">
             <input
               type="checkbox"
-              class="h-7 w-7 accent-green-700"
+              class="tick mx-auto"
               aria-label="Set {labels[i]} done"
               checked={row.setId != null}
               disabled={row.busy}
@@ -217,17 +218,17 @@
           </td>
           <td>
             {#if !row.setId}
-              <button type="button" class="min-h-11 w-10 text-slate-400" aria-label="Remove draft row" onclick={() => removeDraft(row)}>×</button>
+              <button type="button" class="min-h-11 w-10 text-faint" aria-label="Remove draft row" onclick={() => removeDraft(row)}><Icon name="close" /></button>
             {/if}
           </td>
         </tr>
         {#if row.error}
-          <tr><td colspan="5" class="pb-2 text-left text-sm text-red-700"><span role="alert">{row.error}</span></td></tr>
+          <tr><td colspan="5" class="pb-2 text-left text-sm text-live"><span role="alert">{row.error}</span></td></tr>
         {/if}
       {/each}
     </tbody>
   </table>
 
-  <button type="button" class="btn mt-3 w-full" onclick={addRow}>+ Add set</button>
+  <button type="button" class="btn mt-3 w-full" onclick={addRow}><Icon name="plus" size={18} />Add set</button>
   <a href="#/workout" class="btn btn-primary mt-3 w-full">Done with this exercise</a>
 {/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte'
   import Badge from '../components/Badge.svelte'
   import ErrorText from '../components/ErrorText.svelte'
   import ExercisePicker from '../components/ExercisePicker.svelte'
@@ -73,10 +74,10 @@
   }
 </script>
 
-<a href="#/more" class="mb-3 inline-flex min-h-11 items-center text-sm text-slate-600">← More</a>
+<a href="#/more" class="mb-3 inline-flex min-h-11 items-center gap-1 font-display text-sm tracking-[0.08em] text-dim uppercase"><Icon name="back" size={18} />More</a>
 <div class="mb-4 flex items-center justify-between">
-  <h1 class="text-xl font-semibold">Templates</h1>
-  {#if editingId === null}<button type="button" class="btn" onclick={() => open(null)}>+ New</button>{/if}
+  <h1 class="text-3xl leading-none">Templates</h1>
+  {#if editingId === null}<button type="button" class="btn" onclick={() => open(null)}><Icon name="plus" size={18} />New</button>{/if}
 </div>
 <ErrorText message={error} />
 
@@ -91,16 +92,16 @@
           <span class="flex-1">{ex.name}</span>
           <button type="button" class="btn px-3" aria-label="Move {ex.name} up" disabled={i === 0} onclick={() => move(i, -1)}>↑</button>
           <button type="button" class="btn px-3" aria-label="Move {ex.name} down" disabled={i === chosen.length - 1} onclick={() => move(i, 1)}>↓</button>
-          <button type="button" class="btn px-3 text-red-700" aria-label="Remove {ex.name}" onclick={() => (chosen = chosen.filter((x) => x.id !== ex.id))}>×</button>
+          <button type="button" class="btn px-3 text-dim" aria-label="Remove {ex.name}" onclick={() => (chosen = chosen.filter((x) => x.id !== ex.id))}><Icon name="close" /></button>
         </li>
       {:else}
-        <li class="p-2 text-sm text-slate-600">No exercises yet.</li>
+        <li class="p-2 text-sm text-dim">No exercises yet.</li>
       {/each}
     </ol>
     {#if picking}
       <ExercisePicker exclude={chosen.map((e) => e.id)} onPick={(e) => ((chosen = [...chosen, e]), (picking = false))} />
     {:else}
-      <button type="button" class="btn w-full" onclick={() => (picking = true)}>+ Add exercise</button>
+      <button type="button" class="btn w-full" onclick={() => (picking = true)}><Icon name="plus" size={18} />Add exercise</button>
     {/if}
     <div class="flex gap-2">
       <button class="btn btn-primary flex-1" type="submit">Save template</button>
@@ -114,16 +115,16 @@
     <li class="card p-3">
       <div class="mb-2 flex items-center justify-between gap-2">
         <h2 class="font-medium">{t.name}</h2>
-        <span class="text-sm text-slate-600">{t.exercises.length} exercises</span>
+        <span class="text-sm text-dim">{t.exercises.length} exercises</span>
       </div>
-      <p class="mb-3 text-sm text-slate-600">{t.exercises.map((e) => e.name).join(' · ') || 'All its exercises are deleted.'}</p>
+      <p class="mb-3 text-sm text-dim">{t.exercises.map((e) => e.name).join(' · ') || 'All its exercises are deleted.'}</p>
       <div class="flex gap-2">
         <button type="button" class="btn btn-primary flex-1" onclick={() => start(t)}>Start</button>
         <button type="button" class="btn" onclick={() => open(t)}>Edit</button>
-        <button type="button" class="btn text-red-700" aria-label="Delete {t.name}" onclick={() => remove(t)}>×</button>
+        <button type="button" class="btn text-dim" aria-label="Delete {t.name}" onclick={() => remove(t)}><Icon name="close" /></button>
       </div>
     </li>
   {:else}
-    <li class="text-slate-600">No templates yet. Create one here or use "Save as template" after a workout.</li>
+    <li class="text-dim">No templates yet. Create one here or use "Save as template" after a workout.</li>
   {/each}
 </ul>

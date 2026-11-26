@@ -1,5 +1,7 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte'
   import Badge from '../components/Badge.svelte'
+  import Clock from '../components/Clock.svelte'
   import ErrorText from '../components/ErrorText.svelte'
   import ExercisePicker from '../components/ExercisePicker.svelte'
   import { api, errorMessage } from '../lib/api'
@@ -83,9 +85,9 @@
 </script>
 
 {#if loading}
-  <p class="text-slate-600">Loading…</p>
+  <p class="text-dim">Loading…</p>
 {:else if !workout.session}
-  <h1 class="mb-4 text-xl font-semibold">Start workout</h1>
+  <h1 class="mb-4 text-3xl leading-none">Start workout</h1>
   <div class="card space-y-3 p-3">
     <label class="block">
       <span class="label">Gym</span>
@@ -106,10 +108,14 @@
   </div>
   <ErrorText message={error} />
 {:else}
-  <div class="mb-4 flex items-baseline justify-between gap-2">
-    <h1 class="text-xl font-semibold">Workout</h1>
-    <span class="text-sm text-slate-600">{longDate(workout.session.localDate)} · started {time(workout.session.startedAt)}{gymName ? ' · ' + gymName : ''}</span>
-  </div>
+  <header class="-mx-4 -mt-4 mb-4 flex items-end justify-between gap-3 border-b px-4 pt-4 pb-3">
+    <h1 class="sr-only">Workout</h1>
+    <Clock since={workout.session.startedAt} class="text-6xl" />
+    <p class="text-right text-[13px] leading-relaxed text-dim">
+      {#if gymName}<span class="block text-[15px] font-semibold text-ink">{gymName}</span>{/if}
+      {longDate(workout.session.localDate)} · from {time(workout.session.startedAt)}
+    </p>
+  </header>
   <ErrorText message={error} />
 
   {#if exerciseOrder().length}
@@ -119,7 +125,7 @@
           <a href={'#/workout/' + id} class="flex min-h-14 items-center gap-3 p-2">
             {#if names[id]}<Badge initials={names[id].initials} />{/if}
             <span class="flex-1 font-medium">{names[id]?.name ?? '…'}</span>
-            <span class="text-sm text-slate-600">{setCount(id)} sets</span>
+            <span class="text-sm text-dim">{setCount(id)} sets</span>
           </a>
         </li>
       {/each}
@@ -127,7 +133,7 @@
   {/if}
 
   {#if workout.queue.length}
-    <h2 class="mb-2 text-sm font-medium text-slate-600">Up next (template)</h2>
+    <h2 class="mb-2 text-sm font-medium text-dim">Up next (template)</h2>
     <ul class="card mb-4 divide-y">
       {#each workout.queue as id (id)}
         <li>
@@ -149,7 +155,7 @@
       <ExercisePicker onPick={(e) => go('workout/' + e.id)} />
     </div>
   {:else}
-    <button type="button" class="btn mb-3 w-full" onclick={() => (picking = true)}>+ Add exercise</button>
+    <button type="button" class="btn mb-3 w-full" onclick={() => (picking = true)}><Icon name="plus" size={18} />Add exercise</button>
   {/if}
   <button type="button" class="btn btn-primary w-full" onclick={finish}>Finish workout</button>
 {/if}

@@ -30,24 +30,24 @@
 </script>
 
 {#if points.length === 0}
-  <p class="text-sm text-slate-600">No working sets logged yet.</p>
+  <p class="text-sm text-dim">No working sets logged yet.</p>
 {:else if allZero}
-  <p class="text-sm text-slate-600">No added weight logged.</p>
+  <p class="text-sm text-dim">No added weight logged.</p>
 {:else}
   <svg viewBox="0 0 {W} {H}" class="w-full" role="img" aria-label={description}>
     <title>{description}</title>
-    <line x1={PAD.left} x2={W - PAD.right} y1={H - PAD.bottom} y2={H - PAD.bottom} stroke="#cbd5e1" />
-    <text x={PAD.left - 6} y={y(max) + 4} text-anchor="end" font-size="10" fill="#475569">{num(max)}</text>
+    <line x1={PAD.left} x2={W - PAD.right} y1={H - PAD.bottom} y2={H - PAD.bottom} stroke="var(--color-edge)" />
+    <text x={PAD.left - 6} y={y(max) + 4} text-anchor="end" font-size="10" fill="var(--color-dim)">{num(max)}</text>
     {#if max !== min}
-      <text x={PAD.left - 6} y={y(min) + 4} text-anchor="end" font-size="10" fill="#475569">{num(min)}</text>
+      <text x={PAD.left - 6} y={y(min) + 4} text-anchor="end" font-size="10" fill="var(--color-dim)">{num(min)}</text>
     {/if}
-    <text x={x(0)} y={H - 10} text-anchor={points.length === 1 ? 'middle' : 'start'} font-size="10" fill="#475569">{longDate(points[0].localDate)}</text>
+    <text x={x(0)} y={H - 10} text-anchor={points.length === 1 ? 'middle' : 'start'} font-size="10" fill="var(--color-dim)">{longDate(points[0].localDate)}</text>
     {#if points.length > 1}
-      <text x={x(points.length - 1)} y={H - 10} text-anchor="end" font-size="10" fill="#475569">{longDate(points.at(-1)!.localDate)}</text>
+      <text x={x(points.length - 1)} y={H - 10} text-anchor="end" font-size="10" fill="var(--color-dim)">{longDate(points.at(-1)!.localDate)}</text>
     {/if}
-    <polyline points={line} fill="none" stroke="#0f172a" stroke-width="2" />
+    <polyline points={line} fill="none" stroke="var(--color-ink)" stroke-width="2" />
     {#each points as p, i}
-      <circle cx={x(i)} cy={y(p.topWeight)} r="3" fill="#0f172a"><title>{longDate(p.localDate)}: {num(p.topWeight)} {unitLabel(unit)}</title></circle>
+      <circle cx={x(i)} cy={y(p.topWeight)} r="3" fill="var(--color-ink)"><title>{longDate(p.localDate)}: {num(p.topWeight)} {unitLabel(unit)}</title></circle>
     {/each}
   </svg>
 {/if}

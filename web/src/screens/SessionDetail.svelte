@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte'
   import ErrorText from '../components/ErrorText.svelte'
   import { api, errorMessage } from '../lib/api'
   import { confirmAction } from '../lib/dialog.svelte'
@@ -134,11 +135,11 @@
   }
 </script>
 
-<a href="#/history" class="mb-3 inline-flex min-h-11 items-center text-sm text-slate-600">← History</a>
+<a href="#/history" class="mb-3 inline-flex min-h-11 items-center gap-1 font-display text-sm tracking-[0.08em] text-dim uppercase"><Icon name="back" size={18} />History</a>
 <ErrorText message={error} />
 
 {#if session}
-  <h1 class="mb-4 text-xl font-semibold">{longDate(session.localDate)}</h1>
+  <h1 class="mb-4 text-3xl leading-none">{longDate(session.localDate)}</h1>
 
   <form class="card mb-4 space-y-2 p-3" onsubmit={saveSession}>
     <label class="block"
@@ -153,7 +154,7 @@
     {#if !session.open}
       <label class="block"><span class="label">End</span><input class="input" type="datetime-local" bind:value={endedAt} /></label>
     {/if}
-    {#if message}<p class="text-sm text-green-700">{message}</p>{/if}
+    {#if message}<p class="text-sm text-ink">{message}</p>{/if}
     <button class="btn btn-primary w-full" type="submit">Save workout details</button>
   </form>
 
@@ -176,11 +177,11 @@
             <input class="input text-center" inputmode="numeric" aria-label="Reps" bind:value={s.reps} />
             <span class="flex gap-1">
               <button type="button" class="btn px-2" onclick={() => saveSet(s)}>Save</button>
-              <button type="button" class="btn px-2 text-red-700" aria-label="Delete set" onclick={() => deleteSet(s)}>×</button>
+              <button type="button" class="btn px-2 text-dim" aria-label="Delete set" onclick={() => deleteSet(s)}><Icon name="close" /></button>
             </span>
             {#if s.bodyweight != null}
               <label class="col-span-4 flex items-center gap-2 text-sm"
-                ><span class="text-slate-600">Bodyweight</span>
+                ><span class="text-dim">Bodyweight</span>
                 <input class="input w-24" inputmode="decimal" bind:value={s.bodyweight} />
               </label>
             {/if}
@@ -189,7 +190,7 @@
       </ul>
     </section>
   {:else}
-    <p class="mb-3 text-slate-600">No sets yet.</p>
+    <p class="mb-3 text-dim">No sets yet.</p>
   {/each}
 
   <form class="card mb-4 space-y-2 p-3" onsubmit={addSet}>
@@ -216,5 +217,5 @@
     <button class="btn btn-primary w-full" type="submit">Add set</button>
   </form>
 
-  <button type="button" class="btn w-full text-red-700" onclick={deleteSession}>Delete workout</button>
+  <button type="button" class="btn btn-danger w-full" onclick={deleteSession}>Delete workout</button>
 {/if}

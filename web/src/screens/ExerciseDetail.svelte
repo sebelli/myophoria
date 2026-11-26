@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../components/Icon.svelte'
   import Badge from '../components/Badge.svelte'
   import ErrorText from '../components/ErrorText.svelte'
   import ProgressChart from '../components/ProgressChart.svelte'
@@ -90,14 +91,14 @@
   }
 </script>
 
-<a href="#/exercises" class="mb-3 inline-flex min-h-11 items-center text-sm text-slate-600">← Exercises</a>
+<a href="#/exercises" class="mb-3 inline-flex min-h-11 items-center gap-1 font-display text-sm tracking-[0.08em] text-dim uppercase"><Icon name="back" size={18} />Exercises</a>
 <ErrorText message={error} />
 
 {#if exercise}
   <div class="mb-4 flex items-center gap-3">
     <Badge initials={exercise.initials} deleted={exercise.deleted} />
-    <h1 class="text-xl font-semibold">{exercise.name}</h1>
-    {#if exercise.deleted}<span class="rounded bg-slate-200 px-2 text-xs">deleted</span>{/if}
+    <h1 class="text-3xl leading-none">{exercise.name}</h1>
+    {#if exercise.deleted}<span class="border border-edge px-2 font-display text-xs tracking-[0.1em] text-dim uppercase">deleted</span>{/if}
   </div>
 
   <section class="card mb-4 p-3">
@@ -124,15 +125,15 @@
         {#each EQUIPMENT_TYPES as t}<option value={t}>{typeLabel(t)}</option>{/each}
       </select>
       {#if (usage?.sets ?? 0) > 0}
-        <p class="text-xs text-slate-600">The type is fixed once sets are logged ({usage?.sets} {usage?.sets === 1 ? 'set' : 'sets'}).</p>
+        <p class="text-xs text-dim">The type is fixed once sets are logged ({usage?.sets} {usage?.sets === 1 ? 'set' : 'sets'}).</p>
       {/if}
       <select class="input" aria-label="Laterality" bind:value={laterality}>
         <option value="BILATERAL">Bilateral</option>
         <option value="UNILATERAL">Unilateral</option>
       </select>
-      {#if message}<p class="text-sm text-green-700">{message}</p>{/if}
+      {#if message}<p class="text-sm text-ink">{message}</p>{/if}
       <button class="btn btn-primary w-full" type="submit">Save</button>
     </form>
-    <button type="button" class="btn mt-3 w-full text-red-700" onclick={softDelete}>Delete exercise</button>
+    <button type="button" class="btn btn-danger mt-3 w-full" onclick={softDelete}>Delete exercise</button>
   {/if}
 {/if}
