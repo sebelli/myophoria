@@ -14,14 +14,18 @@ Written 2026-11-26.
    the workout, so the user never has to go to History to delete a running workout.
 4. Show the changes live with the Playwright MCP while building.
 
-## Open decisions (ask first; defaults apply if the developer says "go")
+## Decisions (answered by the developer 2026-11-26)
 
-| # | Question | Default |
+| # | Question | Answer |
 |---|---|---|
-| 1 | Theme base: black background + red accents, or white background + black/red? | black + red |
+| 1 | Theme base: black background + red accents, or white background + black/red? | black background, red accents |
 | 2 | Collapse: one exercise open at a time, or several? | one at a time |
 | 3 | Also flatten History → session, Exercises → detail, More → sub-screens? | no, leave them |
-| 4 | Restart the backend on a throwaway copy of `data/` for testing? | yes |
+| 4 | Test on a throwaway copy of `data/`? | yes |
+
+Testing note: the live backend on the real `data/` keeps running untouched. The UI pass runs a
+second backend on a snapshot (`sqlite3 data/myophoria.db ".backup <copy>"`) with
+`MYOPHORIA_PORT=7071`, and Vite with `MYOPHORIA_API=http://127.0.0.1:7071 npm run dev`.
 
 ## Steps (one Conventional Commit each, scope `web`)
 
