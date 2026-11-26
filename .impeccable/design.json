@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-26T00:00:00Z",
+  "title": "Design System: Myophoria",
+  "extensions": {
+    "colorMeta": {
+      "live": { "role": "primary", "displayName": "Wall Clock Red", "canonical": "#e8392f", "tonalRamp": ["#3a0d0a", "#5c1510", "#821d16", "#a8261d", "#e8392f", "#ef6a62", "#f59d97", "#fbd2cf"] },
+      "ground": { "role": "neutral", "displayName": "Matte Black", "canonical": "#000000", "tonalRamp": ["#000000", "#0f0f0f", "#242424", "#3a3a3a", "#5e5e5e", "#8c8c8c", "#c0c0c0", "#f2f2f2"] },
+      "field": { "role": "neutral", "displayName": "Panel Black", "canonical": "#0f0f0f", "tonalRamp": ["#000000", "#0f0f0f", "#242424", "#3a3a3a", "#5e5e5e", "#8c8c8c", "#c0c0c0", "#f2f2f2"] },
+      "line": { "role": "neutral", "displayName": "Hairline", "canonical": "#242424", "tonalRamp": ["#000000", "#0f0f0f", "#242424", "#3a3a3a", "#5e5e5e", "#8c8c8c", "#c0c0c0", "#f2f2f2"] },
+      "edge": { "role": "neutral", "displayName": "Edge Grey", "canonical": "#3a3a3a", "tonalRamp": ["#000000", "#0f0f0f", "#242424", "#3a3a3a", "#5e5e5e", "#8c8c8c", "#c0c0c0", "#f2f2f2"] },
+      "faint": { "role": "neutral", "displayName": "Faint Grey", "canonical": "#5e5e5e", "tonalRamp": ["#000000", "#0f0f0f", "#242424", "#3a3a3a", "#5e5e5e", "#8c8c8c", "#c0c0c0", "#f2f2f2"] },
+      "dim": { "role": "neutral", "displayName": "Dim Grey", "canonical": "#8c8c8c", "tonalRamp": ["#000000", "#0f0f0f", "#242424", "#3a3a3a", "#5e5e5e", "#8c8c8c", "#c0c0c0", "#f2f2f2"] },
+      "ink": { "role": "neutral", "displayName": "White Ink", "canonical": "#f2f2f2", "tonalRamp": ["#000000", "#0f0f0f", "#242424", "#3a3a3a", "#5e5e5e", "#8c8c8c", "#c0c0c0", "#f2f2f2"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Clock", "purpose": "The running elapsed clock only: 60px in the Workout header, 30px in the active workout bar." },
+      "headline": { "displayName": "Headline", "purpose": "Screen titles (h1), Oswald caps." },
+      "title": { "displayName": "Title", "purpose": "Exercise names in workout rows." },
+      "number": { "displayName": "Number", "purpose": "Set labels and weight/reps values in the set table." },
+      "body": { "displayName": "Body", "purpose": "Running text, dates, notes; Barlow, never uppercased." },
+      "button": { "displayName": "Button", "purpose": "Every button label." },
+      "tab": { "displayName": "Tab", "purpose": "Bottom navigation labels." },
+      "label": { "displayName": "Label", "purpose": "Form labels, table headers, section headers; dim grey." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "none", "value": "0ms", "purpose": "State changes are instant; nothing fades or slides. The clock's digits change once a second with no transition." }
+    ],
+    "breakpoints": [
+      { "name": "column", "value": "36rem", "purpose": "Max width of the single centred column; layout is identical at every width." }
+    ],
+    "browser": {
+      "colorScheme": "dark",
+      "selection": "background #e8392f, text #000000",
+      "caret": "#e8392f",
+      "scrollbar": "thumb #3a3a3a, track #000000",
+      "focusRing": "outline 2px solid #f2f2f2, offset 2px",
+      "tapHighlight": "transparent"
+    }
+  },
+  "components": [
+    {
+      "name": "Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Default outlined action: square, edge-grey outline, Oswald caps.",
+      "html": "<button class=\"ds-btn\">Add exercise</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 1px solid var(--color-edge, #3a3a3a); border-radius: 0; background: transparent; color: var(--color-ink, #f2f2f2); font-family: Oswald, Barlow, system-ui, sans-serif; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; } .ds-btn:focus-visible { outline: 2px solid var(--color-ink, #f2f2f2); outline-offset: 2px; } .ds-btn:disabled { border-color: var(--color-line, #242424); color: var(--color-faint, #5e5e5e); }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Solid white main forward action (Finish workout, Start, Resume, Save) and non-destructive dialog answers.",
+      "html": "<button class=\"ds-btn-primary\">Finish workout</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 16px; border: 1px solid var(--color-ink, #f2f2f2); border-radius: 0; background: var(--color-ink, #f2f2f2); color: var(--color-ground, #000000); font-family: Oswald, Barlow, system-ui, sans-serif; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-ink, #f2f2f2); outline-offset: 2px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Destructive confirmation: red outline and red text, never a red fill.",
+      "html": "<button class=\"ds-btn-danger\">Discard workout</button>",
+      "css": ".ds-btn-danger { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 16px; border: 1px solid var(--color-live, #e8392f); border-radius: 0; background: transparent; color: var(--color-live, #e8392f); font-family: Oswald, Barlow, system-ui, sans-serif; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; } .ds-btn-danger:focus-visible { outline: 2px solid var(--color-ink, #f2f2f2); outline-offset: 2px; }"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Panel-black well, edge-grey border that turns white on focus, red caret.",
+      "html": "<label class=\"ds-label\">Name</label><input class=\"ds-input\" placeholder=\"Bench press\" />",
+      "css": ".ds-label { display: block; margin-bottom: 4px; font-family: Oswald, Barlow, system-ui, sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-dim, #8c8c8c); } .ds-input { width: 100%; min-height: 44px; padding: 0 8px; border: 1px solid var(--color-edge, #3a3a3a); border-radius: 0; background: var(--color-field, #0f0f0f); color: var(--color-ink, #f2f2f2); font-family: Barlow, system-ui, sans-serif; font-size: 16px; caret-color: var(--color-live, #e8392f); } .ds-input::placeholder { color: var(--color-dim, #8c8c8c); } .ds-input:focus { border-color: var(--color-ink, #f2f2f2); outline: none; } .ds-input:focus-visible { outline: 2px solid var(--color-ink, #f2f2f2); outline-offset: 2px; } .ds-input:disabled { border-color: var(--color-line, #242424); color: var(--color-dim, #8c8c8c); }"
+    },
+    {
+      "name": "Done Box",
+      "kind": "custom",
+      "refersTo": "tick",
+      "description": "Square set checkbox: 2px edge outline, fills white with a cut-out check when ticked.",
+      "html": "<input type=\"checkbox\" class=\"ds-tick\" aria-label=\"Done\" /> <input type=\"checkbox\" class=\"ds-tick\" aria-label=\"Done\" checked />",
+      "css": ".ds-tick { display: inline-grid; place-content: center; width: 32px; height: 32px; margin: 0; appearance: none; -webkit-appearance: none; border: 2px solid var(--color-edge, #3a3a3a); border-radius: 0; background: transparent; cursor: pointer; } .ds-tick:checked { border-color: var(--color-ink, #f2f2f2); background: var(--color-ink, #f2f2f2); } .ds-tick:checked::before { content: \"\"; display: block; width: 20px; height: 20px; background: var(--color-ground, #000000); -webkit-mask: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='square'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7'/%3E%3C/svg%3E\") center / contain no-repeat; mask: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='square'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7'/%3E%3C/svg%3E\") center / contain no-repeat; } .ds-tick:focus-visible { outline: 2px solid var(--color-ink, #f2f2f2); outline-offset: 2px; }"
+    },
+    {
+      "name": "Workout Clock",
+      "kind": "custom",
+      "refersTo": "clock",
+      "description": "The signature: red Oswald elapsed time, tabular, ticking once a second with no animation.",
+      "html": "<div class=\"ds-clock-head\"><span class=\"ds-clock\" role=\"timer\">0:22</span><p class=\"ds-clock-meta\"><b>Default</b>Thu, Nov 26, 2026 · from 09:56 AM</p></div>",
+      "css": ".ds-clock-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 16px 16px 12px; border-bottom: 1px solid var(--color-line, #242424); background: var(--color-ground, #000000); } .ds-clock { font-family: Oswald, Barlow, system-ui, sans-serif; font-weight: 500; font-size: 60px; line-height: 1; color: var(--color-live, #e8392f); font-variant-numeric: tabular-nums; } .ds-clock-meta { margin: 0; text-align: right; font-family: Barlow, system-ui, sans-serif; font-size: 13px; line-height: 1.6; color: var(--color-dim, #8c8c8c); } .ds-clock-meta b { display: block; font-size: 15px; font-weight: 600; color: var(--color-ink, #f2f2f2); }"
+    },
+    {
+      "name": "Active Workout Bar",
+      "kind": "custom",
+      "refersTo": "workout-bar",
+      "description": "Panel-black strip above the tabs on other screens: the same red clock, End and Resume.",
+      "html": "<div class=\"ds-bar\"><span class=\"ds-bar-clock\">41:07</span><span class=\"ds-bar-label\">Workout<br />running</span><button class=\"ds-bar-btn\">End</button><button class=\"ds-bar-btn ds-bar-btn-primary\">Resume</button></div>",
+      "css": ".ds-bar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-top: 1px solid var(--color-line, #242424); background: var(--color-field, #0f0f0f); } .ds-bar-clock { font-family: Oswald, Barlow, system-ui, sans-serif; font-weight: 500; font-size: 30px; line-height: 1; color: var(--color-live, #e8392f); font-variant-numeric: tabular-nums; } .ds-bar-label { flex: 1; font-family: Oswald, Barlow, system-ui, sans-serif; font-size: 12px; line-height: 1.25; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-dim, #8c8c8c); } .ds-bar-btn { min-height: 44px; padding: 0 12px; border: 1px solid var(--color-edge, #3a3a3a); border-radius: 0; background: transparent; color: var(--color-ink, #f2f2f2); font-family: Oswald, Barlow, system-ui, sans-serif; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; } .ds-bar-btn-primary { border-color: var(--color-ink, #f2f2f2); background: var(--color-ink, #f2f2f2); color: var(--color-ground, #000000); } .ds-bar-btn:focus-visible { outline: 2px solid var(--color-ink, #f2f2f2); outline-offset: 2px; }"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "nav-tab",
+      "description": "Four equal Oswald caps tabs on black; the active tab is red text only.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-tab ds-tab-active\" href=\"#\" aria-current=\"page\">Workout</a><a class=\"ds-tab\" href=\"#\">Exercises</a><a class=\"ds-tab\" href=\"#\">History</a><a class=\"ds-tab\" href=\"#\">More</a></nav>",
+      "css": ".ds-nav { display: flex; border-top: 1px solid var(--color-line, #242424); background: var(--color-ground, #000000); } .ds-tab { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 56px; font-family: Oswald, Barlow, system-ui, sans-serif; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; color: var(--color-dim, #8c8c8c); } .ds-tab-active { color: var(--color-live, #e8392f); } .ds-tab:focus-visible { outline: 2px solid var(--color-ink, #f2f2f2); outline-offset: 2px; }"
+    },
+    {
+      "name": "Exercise Row",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Hairline-divided full-width row: Oswald caps name, count right, square-cap chevron. Open row in ink with a red count.",
+      "html": "<ul class=\"ds-rows\"><li><button class=\"ds-row\"><span class=\"ds-row-name\">One-arm dumbbell row</span><span class=\"ds-row-count\">2 sets</span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"square\"><path d=\"M6 9l6 6 6-6\"/></svg></button></li><li><button class=\"ds-row ds-row-open\"><span class=\"ds-row-name\">Bench press</span><span class=\"ds-row-live\">3/3</span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"square\" style=\"transform: rotate(180deg)\"><path d=\"M6 9l6 6 6-6\"/></svg></button></li></ul>",
+      "css": ".ds-rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--color-line, #242424); border-bottom: 1px solid var(--color-line, #242424); } .ds-rows li + li { border-top: 1px solid var(--color-line, #242424); } .ds-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 0; border: 0; background: transparent; color: var(--color-dim, #8c8c8c); text-align: left; cursor: pointer; } .ds-row-name { flex: 1; font-family: Oswald, Barlow, system-ui, sans-serif; font-size: 20px; letter-spacing: 0.04em; text-transform: uppercase; } .ds-row-open .ds-row-name { color: var(--color-ink, #f2f2f2); } .ds-row-count { font-family: Barlow, system-ui, sans-serif; font-size: 14px; } .ds-row-live { font-family: Oswald, Barlow, system-ui, sans-serif; font-size: 16px; color: var(--color-live, #e8392f); } .ds-row:focus-visible { outline: 2px solid var(--color-ink, #f2f2f2); outline-offset: 2px; }"
+    },
+    {
+      "name": "Badge",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "40px square outlined initials for an exercise; deleted ones step down to hairline and faint.",
+      "html": "<span class=\"ds-badge\">BP</span> <span class=\"ds-badge ds-badge-deleted\">OADR</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--color-edge, #3a3a3a); border-radius: 0; color: var(--color-dim, #8c8c8c); font-family: Oswald, Barlow, system-ui, sans-serif; font-size: 14px; letter-spacing: 0.025em; } .ds-badge-deleted { border-color: var(--color-line, #242424); color: var(--color-faint, #5e5e5e); font-size: 12px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Wall Clock",
+    "overview": "The workout runs under the gym's wall clock. One big red elapsed clock owns the top of the Workout screen; everything else is plain white ink on matte black. The lifter glances, sees how long they have trained, which exercise is open and which set is next, ticks it and moves on. The system refuses the category default of rounded dark cards, coloured badges and red buttons everywhere.\n\nDensity is that of a scoreboard read from a bench: few elements, large tap targets, condensed capitals for anything that is a name, a label or a number. Structure comes from one-pixel hairlines and a stepped grey ramp, never from boxes, fills or shadows. Nothing moves except the clock's digits, which change once a second with no animation; every other state change is instant.\n\nThe world replaced an unstyled stock-Tailwind slate-and-white look. It is dark only, by design, and declares `color-scheme: dark` so native selects, date pickers, file pickers and dialogs render in the same world.",
+    "keyCharacteristics": [
+      "Matte black ground, near-white ink, one six-step grey ramp, one red.",
+      "Red means time, live state or consequence; never decoration.",
+      "Oswald condensed caps for headings, labels, numbers, tabs and buttons; Barlow for running text.",
+      "Tabular numerals everywhere.",
+      "Square corners, hairlines, no cards, no shadows, no motion.",
+      "44px minimum tap targets; 48px buttons; 56px rows."
+    ],
+    "rules": [
+      { "name": "The Red Means Now Rule", "body": "Red marks time, the thing to do next, live state, a failure set, or a consequence (destruction or error). If a red element answers none of those, it is wrong. Never use red as a fill, a background or an accent.", "section": "colors" },
+      { "name": "The One Ramp Rule", "body": "Hierarchy comes from stepping along the grey ramp (ground, field, line, edge, faint, dim, ink), not from new hues. Do not add a second accent colour.", "section": "colors" },
+      { "name": "The Caps Are Oswald Rule", "body": "Uppercase is only ever set in Oswald, always with positive tracking (0.04em for headings and names, 0.08em for buttons, 0.1em for labels and tabs). Barlow is never uppercased.", "section": "typography" },
+      { "name": "The Tabular Rule", "body": "The body sets `font-variant-numeric: tabular-nums`; weights, reps and the clock never jitter as digits change.", "section": "typography" },
+      { "name": "The No-Card Rule", "body": "Groups are separated by hairlines above and below, never boxed. A \"card\" in this system is a top and bottom hairline with nothing else.", "section": "elevation" }
+    ],
+    "dos": [
+      "**Do** keep every corner square (0px) and every border one pixel (2px only on the done box).",
+      "**Do** separate groups with hairlines (#242424 line) above and below, not boxes.",
+      "**Do** set every label, heading, tab, button and number in Oswald caps with positive tracking, and all running text in Barlow.",
+      "**Do** keep tap targets at least 44px and buttons 48px tall.",
+      "**Do** make state changes instant: the open row, ticked sets, tabs and dialogs switch without fades or slides.",
+      "**Do** draw new icons as 24px line paths with a 2px stroke and square caps, using currentColor.",
+      "**Do** reserve the solid white primary button for the screen's main forward action and dialog answers; everything else is outlined."
+    ],
+    "donts": [
+      "**Don't** use red for anything but the clock, the next thing to do, live state, a failure set, destruction or an error; never as a fill or background.",
+      "**Don't** add rounded corners, cards, shadows or gradients.",
+      "**Don't** add a second accent hue; step the grey ramp instead.",
+      "**Don't** animate anything; the clock ticks once a second with no transition.",
+      "**Don't** uppercase Barlow or set body sentences in Oswald.",
+      "**Don't** load fonts from a CDN; add weights as self-hosted woff2 with their licence."
+    ]
+  }
+}
