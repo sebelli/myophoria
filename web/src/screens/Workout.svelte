@@ -37,6 +37,9 @@
         templates = tpl
       } else {
         await loadNames()
+        // a fresh load (no card built yet) reopens the exercise of the last logged set
+        const last = open.sets.at(-1)
+        if (last && Object.keys(workout.cards).length === 0) await openExercise(last.exerciseId)
       }
     } catch (e) {
       error = errorMessage(e)
